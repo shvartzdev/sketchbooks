@@ -46,13 +46,18 @@ export async function siteBooks() {
 
 const cache = new Map()
 
+// Имя файла без пути и расширения: копии для экрана лежат рядом под тем же
+// именем, но в webp — так их не приходится перечислять в book.json.
+const stem = (file) => file.split('/').pop().replace(/\.[^.]+$/, '')
+
 // Одна книжка: описание и страницы с адресами картинок.
 export function siteBook(slug) {
   if (cache.has(slug)) return cache.get(slug)
   const promise = (async () => {
-    const res = await fetch(dataUrl(`${slug}/book.json`))
+    const [index, res] = await Promise.all([siteIndex(), fetch(dataUrl(`${slug}/book.json`))])
     if (!res.ok) throw new Error(`Нет файла ${slug}/book.json`)
     const manifest = await res.json()
+    const sizes = index.sizes
     const book = {
       id: slug,
       slug,
@@ -67,12 +72,19 @@ export function siteBook(slug) {
       order: i,
       blob: null,
       thumb: null,
-      items: (page.items || []).map((it) => ({
-        ...it,
-        // вместо блоба — адрес: дальше он проходит везде, где раньше был блоб
-        blob: dataUrl(`${slug}/${it.file}`),
-        thumb: dataUrl(`${slug}/${it.thumb || it.file}`),
-      })),
+      items: (page.items || []).map((it) => {
+        const origin = dataUrl(`${slug}/${it.file}`)
+        return {
+          ...it,
+          // вместо блоба — адрес: дальше он проходит везде, где раньше был блоб.
+          // На экран идёт копия поменьше, оригинал остаётся для PDF.
+          blob: sizes?.web ? dataUrl(`${slug}/${sizes.web}/${stem(it.file)}.webp`) : origin,
+          thumb: sizes?.mini
+            ? dataUrl(`${slug}/${sizes.mini}/${stem(it.file)}.webp`)
+            : dataUrl(`${slug}/${it.thumb || it.file}`),
+          origin,
+        }
+      }),
     }))
     return { book, pages }
   })()
@@ -80,8 +92,20 @@ export function siteBook(slug) {
   return promise
 }
 
-// Работы на стене: имена файлов известны из index.json, пропорции узнаём у браузера.
+/*
+ * Работы на стене. Пропорции посчитаны при сборке и лежат прямо здесь:
+ * иначе рама не знает своей формы, пока не доедет сама картина, и стена
+ * стоит с пустыми местами — на медленном канале это полминуты.
+ */
 export async function siteArt() {
   const index = await siteIndex()
-  return (index.art || []).map((name) => ({ name, url: dataUrl(`art/${name}`) }))
+  return (index.art || []).map((art) =>
+    typeof art === 'string'
+      ? { name: art, url: dataUrl(`art/${art}`) } // сводка старого образца
+      : {
+          name: art.name,
+          url: dataUrl(`art/${art.file || art.name}`),
+          aspect: art.w && art.h ? art.w / art.h : undefined,
+        },
+  )
 }

@@ -2,5 +2,8 @@ node_modules
 dist
 .DS_Store
 
-# сводка полки собирается сама при каждой сборке
+# сводка полки и копии для экрана собираются при каждой сборке
 public/data/index.json
+public/data/*/web/
+public/data/*/mini/
+public/data/art/web/

@@ -33,6 +33,8 @@ export async function loadBook(id) {
  * там просто не возвращается — стена осталась бы без работ.
  */
 function withAspect(item) {
+  // на витрине пропорции уже посчитаны при сборке — спрашивать некого
+  if (item.aspect) return Promise.resolve(item)
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () =>

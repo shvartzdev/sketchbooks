@@ -49,7 +49,8 @@ async function renderPage(page, book, pxPerMm) {
 
   for (const item of page.items || []) {
     if (!item.blob) continue
-    const bitmap = await loadBitmap(item.blob)
+    // в PDF идёт оригинал: на экране хватает уменьшенной копии, а в печать — нет
+    const bitmap = await loadBitmap(item.origin || item.blob)
     const c = getCrop(item)
     const fw = item.w * W
     const fh = item.h * H
