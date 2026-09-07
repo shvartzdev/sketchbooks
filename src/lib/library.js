@@ -24,17 +24,22 @@ export async function loadBook(id) {
   return { book, pages }
 }
 
-// Пропорции работы узнаём у браузера: и у файла с диска, и у файла с сайта
-// это один и тот же вопрос к картинке.
-async function withAspect(item) {
-  const img = new Image()
-  img.src = item.url
-  try {
-    await img.decode()
-  } catch {
-    return null // не картинка или не открылась
-  }
-  return { name: item.name, url: item.url, aspect: img.naturalWidth / img.naturalHeight }
+/*
+ * Пропорции работы узнаём у браузера: и у файла с диска, и у файла с сайта
+ * это один и тот же вопрос к картинке.
+ *
+ * Спрашиваем через onload, а не через decode(): вкладка в фоне (свёрнутый
+ * браузер, соседняя вкладка на телефоне) картинки не декодирует, и decode()
+ * там просто не возвращается — стена осталась бы без работ.
+ */
+function withAspect(item) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () =>
+      resolve({ name: item.name, url: item.url, aspect: img.naturalWidth / img.naturalHeight })
+    img.onerror = () => resolve(null) // не картинка или не открылась
+    img.src = item.url
+  })
 }
 
 export async function loadArtwork() {
