@@ -11,7 +11,7 @@ import { getCrop } from '../lib/crop.js'
  * весит пару килобайт и приезжает мгновенно, поэтому страница никогда не
  * стоит пустой — она просто становится резче через секунду.
  */
-export default function ItemView({ item, thumbs = false, onLoad }) {
+export default function ItemView({ item, thumbs = false, eager = false, onLoad }) {
   const [sharp, setSharp] = useState(false)
   const c = getCrop(item)
   const style = {
@@ -30,7 +30,7 @@ export default function ItemView({ item, thumbs = false, onLoad }) {
         alt=""
         draggable={false}
         decoding="async"
-        loading={thumbs ? 'lazy' : 'eager'}
+        loading={thumbs && !eager ? 'lazy' : 'eager'}
         fetchPriority={thumbs ? 'low' : 'high'}
         onLoad={onLoad}
         style={style}

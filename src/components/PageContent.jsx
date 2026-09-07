@@ -9,27 +9,22 @@ import ItemView from './ItemView.jsx'
  *
  * thumbs — режим для ленты и обзора: берём уменьшенные копии, иначе сотня
  * страниц заставит браузер декодировать сотню полноразмерных снимков.
- *
- * images=false — страница вообще без картинок. Нужно для дальних листов
- * стопки: браузер выкачивает все запрошенные картинки разом, и на медленном
- * канале десяток дальних страниц отнимает канал у той, которую сейчас смотрят.
- * Тогда разворот приходит последним, а до него мелькают случайные страницы.
  */
-function PageContent({ page, number, showNumber = true, side = 'right', thumbs = false, images = true }) {
+function PageContent({ page, number, showNumber = true, side = 'right', thumbs = false, eager = false }) {
   if (!page) return null
-  const items = images ? page.items || [] : []
+  const items = page.items || []
   const pick = (full, small) => (thumbs ? small || full : full)
 
   return (
     <div className="page-content">
-      {images && page.blob && (
+      {page.blob && (
         <img
           className="page-scan"
           src={blobUrl(pick(page.blob, page.thumb))}
           alt=""
           draggable={false}
           decoding="async"
-          loading={thumbs ? 'lazy' : 'eager'}
+          loading={thumbs && !eager ? 'lazy' : 'eager'}
         />
       )}
       {items.map((it) => (
@@ -44,7 +39,7 @@ function PageContent({ page, number, showNumber = true, side = 'right', thumbs =
             transform: it.rot ? `rotate(${it.rot}deg)` : undefined,
           }}
         >
-          <ItemView item={it} thumbs={thumbs} />
+          <ItemView item={it} thumbs={thumbs} eager={eager} />
         </div>
       ))}
       {showNumber && number != null && (

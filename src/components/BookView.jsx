@@ -23,7 +23,6 @@ import { Confirm, NumberAsk } from './Dialog.jsx'
  */
 
 const WINDOW = 6 // сколько листов держим смонтированными по каждую сторону
-const NEAR = 2 // а на скольких из них есть картинки: остальные — чистая бумага
 
 /*
  * Стопка под разворотом. Каждый следующий лист выступает чуть меньше
@@ -847,24 +846,12 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                       else leafEls.current.delete(i)
                     }}
                   >
-                    {/* Три степени подробности. Разворот и его соседи — полные
-                        снимки, следующие два листа — миниатюры про запас,
-                        дальше бумага пустая. Канал у зрителя бывает узкий,
-                        и он должен уходить на ту страницу, которую смотрят. */}
-                    <Face
-                      slot={slots[i * 2]}
-                      side="front"
-                      book={book}
-                      thumbs={!full(i, 'front')}
-                      images={Math.abs(i - index) <= NEAR}
-                    />
-                    <Face
-                      slot={slots[i * 2 + 1]}
-                      side="back"
-                      book={book}
-                      thumbs={!full(i, 'back')}
-                      images={Math.abs(i - index) <= NEAR}
-                    />
+                    {/* Картинки есть на каждом листе стопки — иначе листать
+                        нечего. Разница только в весе: две видимые страницы
+                        берут полный снимок, остальные обходятся миниатюрой
+                        в пару килобайт, которая и так нужна для ленты. */}
+                    <Face slot={slots[i * 2]} side="front" book={book} thumbs={!full(i, 'front')} />
+                    <Face slot={slots[i * 2 + 1]} side="back" book={book} thumbs={!full(i, 'back')} />
                   </div>
                 ))}
               </div>
@@ -883,9 +870,6 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
               aspect={aspect}
               onPick={pickPage}
               onDelete={EDITOR ? askDeletePage : null}
-              /* лента ждёт, пока развернётся сам разворот: сто миниатюр разом
-                 отбирают канал у страницы, которую сейчас смотрят */
-              images={wide}
             />
           )}
         </>
@@ -960,7 +944,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   )
 }
 
-function Face({ slot, side, book, thumbs = false, images = true }) {
+function Face({ slot, side, book, thumbs = false }) {
   const kind = slot?.kind ?? 'empty'
   const isCover = kind === 'cover' || kind === 'backcover'
   return (
@@ -982,7 +966,10 @@ function Face({ slot, side, book, thumbs = false, images = true }) {
           number={slot.number}
           side={side === 'front' ? 'right' : 'left'}
           thumbs={thumbs}
-          images={images}
+          /* лист стопки может быть повёрнут от зрителя, и «ленивая» загрузка
+             отложила бы его до поворота — то есть ровно до того мгновения,
+             когда картинка и нужна */
+          eager
         />
       )}
       <div className="face-gutter" />
