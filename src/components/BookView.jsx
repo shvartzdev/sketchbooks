@@ -6,6 +6,7 @@ import { askPermission, folderState, getFolder, syncBook } from '../lib/folder.j
 import { bookToPdf } from '../lib/pdf.js'
 import { useFlipper } from '../lib/flip.js'
 import { loadBook } from '../lib/library.js'
+import { prefetch, stopPrefetch } from '../lib/prefetch.js'
 import { EDITOR } from '../lib/mode.js'
 import Overview from './Overview.jsx'
 import PageRail from './PageRail.jsx'
@@ -55,6 +56,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   const [editing, setEditing] = useState(null) // индекс страницы, открытой крупно
   const [ask, setAsk] = useState(null)
   const [zoom, setZoom] = useState(null) // страница, открытая крупно (витрина)
+  const [preload, setPreload] = useState(null) // { done, total } — довозим книжку
   const [renaming, setRenaming] = useState(false)
   const [notice, setNotice] = useState(null) // что не удалось прочитать
   const [sync, setSync] = useState({ state: 'none' }) // как дела с папкой на диске
@@ -280,6 +282,19 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
       alive = false
     }
   }, [bookId])
+
+  /*
+   * Книжка целиком — превьюшками, по порядку, в один поток. Пока она едет,
+   * внизу видно, сколько осталось: ожидание должно быть понятным, а не
+   * «почему-то пусто». Когда довезли, листается всё и мгновенно.
+   */
+  useEffect(() => {
+    if (EDITOR || !pages.length) return
+    const urls = pages.flatMap((p) => (p.items || []).map((it) => it.thumb)).filter(Boolean)
+    if (!urls.length) return
+    prefetch(urls, (done, total) => setPreload(done >= total ? null : { done, total }))
+    return stopPrefetch
+  }, [pages])
 
   /* ---------- размер разворота ---------- */
 
@@ -875,6 +890,16 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
         </>
       )}
 
+      {preload && (
+        <div className="toast toast-progress">
+          <span>
+            Загружаем книжку… {preload.done} / {preload.total}
+          </span>
+          <span className="progress">
+            <span style={{ width: `${Math.round((preload.done / preload.total) * 100)}%` }} />
+          </span>
+        </div>
+      )}
       {importing && (
         <div className="toast">
           {importing.label || 'Обрабатываем изображения'}… {importing.done} / {importing.total}

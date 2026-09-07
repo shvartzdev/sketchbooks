@@ -960,3 +960,24 @@ input[type='text'], input[type='number'], .field input {
 @media (prefers-reduced-motion: reduce) {
   .zoom { animation: none; }
 }
+
+/* полоса довозки: сколько книжки уже приехало */
+.toast-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 220px;
+}
+.toast-progress .progress {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.toast-progress .progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease-out;
+}
