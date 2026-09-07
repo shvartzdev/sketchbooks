@@ -1,0 +1,605 @@
+{
+  "format": "sketchbook/1",
+  "title": "Бесконечный",
+  "widthMm": 210,
+  "heightMm": 297,
+  "coverColor": "#2f3640",
+  "year": 2026,
+  "shelf": 0,
+  "order": 0,
+  "createdAt": 1788622580640,
+  "updatedAt": 1788628961542,
+  "pages": [
+    {
+      "id": "6a70xth4mtojpfey",
+      "items": [
+        {
+          "id": "i5ivnji4mtrebw9p",
+          "file": "images/i5ivnji4mtrebw9p.jpg",
+          "thumb": "thumbs/i5ivnji4mtrebw9p.jpg",
+          "x": -0.00611,
+          "y": -0.00154,
+          "w": 1.01808,
+          "h": 1.00198,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 842,
+          "ih": 1172
+        }
+      ]
+    },
+    {
+      "id": "gv5auvecmtojpfey",
+      "items": [
+        {
+          "id": "6zhvtg0jmtrec65s",
+          "file": "images/6zhvtg0jmtrec65s.jpg",
+          "thumb": "thumbs/6zhvtg0jmtrec65s.jpg",
+          "x": 0.00075,
+          "y": -0.01163,
+          "w": 1.00019,
+          "h": 1.03824,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 846,
+          "ih": 1242
+        }
+      ]
+    },
+    {
+      "id": "ry58pl3emtojpfey",
+      "items": [
+        {
+          "id": "jqkxxzdemtrecf82",
+          "file": "images/jqkxxzdemtrecf82.jpg",
+          "thumb": "thumbs/jqkxxzdemtrecf82.jpg",
+          "x": -0.01014,
+          "y": 0.00659,
+          "w": 1.02408,
+          "h": 0.98308,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 822,
+          "ih": 1116
+        }
+      ]
+    },
+    {
+      "id": "03abr662mtojpfey",
+      "items": [
+        {
+          "id": "uuagju0lmtrjh2er",
+          "file": "images/uuagju0lmtrjh2er.jpg",
+          "thumb": "thumbs/uuagju0lmtrjh2er.jpg",
+          "x": -0.01902,
+          "y": -0.00267,
+          "w": 1.01719,
+          "h": 1.00235,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 818,
+          "ih": 1140
+        }
+      ]
+    },
+    {
+      "id": "7zf1oo0imtojpfey",
+      "items": [
+        {
+          "id": "kfavz8c0mtrjhbdv",
+          "file": "images/kfavz8c0mtrjhbdv.jpg",
+          "thumb": "thumbs/kfavz8c0mtrjhbdv.jpg",
+          "x": -0.07967,
+          "y": -0.02419,
+          "w": 1.07573,
+          "h": 1.01687,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 748,
+          "ih": 1000
+        }
+      ]
+    },
+    {
+      "id": "yumj3c6hmtojpfey",
+      "items": []
+    },
+    {
+      "id": "0mylwi5lmtojpfey",
+      "items": []
+    },
+    {
+      "id": "73f4odt2mtojpfey",
+      "items": []
+    },
+    {
+      "id": "miuczt5kmtojpfey",
+      "items": []
+    },
+    {
+      "id": "2k39qhkhmtojpfey",
+      "items": []
+    },
+    {
+      "id": "i6doopjjmtojpfey",
+      "items": []
+    },
+    {
+      "id": "t5v3qgg1mtojpfey",
+      "items": []
+    },
+    {
+      "id": "mmn30p4wmtojpfey",
+      "items": []
+    },
+    {
+      "id": "h2d9si6wmtojpfey",
+      "items": []
+    },
+    {
+      "id": "jw4cjd73mtojpfey",
+      "items": []
+    },
+    {
+      "id": "cp1o1v09mtojpfey",
+      "items": []
+    },
+    {
+      "id": "nf8opkjgmtojpfey",
+      "items": []
+    },
+    {
+      "id": "omvgqdu9mtojpfey",
+      "items": []
+    },
+    {
+      "id": "okbzp2bnmtojpfey",
+      "items": []
+    },
+    {
+      "id": "be5khgyvmtojpfey",
+      "items": []
+    },
+    {
+      "id": "25su64n4mtojpfey",
+      "items": []
+    },
+    {
+      "id": "zrqduy1zmtojpfey",
+      "items": []
+    },
+    {
+      "id": "p8zc82oumtojpfey",
+      "items": []
+    },
+    {
+      "id": "hmbr7wsfmtojpfey",
+      "items": []
+    },
+    {
+      "id": "ghd4569omtoni3ge",
+      "items": []
+    },
+    {
+      "id": "4ue2iffrmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "w8c0910tmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "rpvpzvdemtoni3ge",
+      "items": []
+    },
+    {
+      "id": "m43np0uwmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "sxdgmmt4mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "hr131v51mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "jxq2phfamtoni3ge",
+      "items": []
+    },
+    {
+      "id": "dui9btbcmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "mg7tf8t9mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "0at7wbgtmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "81l30gsamtoni3ge",
+      "items": []
+    },
+    {
+      "id": "omze9c32mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "3zaa8bzmmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "9sybiy9bmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "87xhheglmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "z89ahnlgmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "bfnumpocmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "m7r6sb4smtoni3ge",
+      "items": []
+    },
+    {
+      "id": "tn8cdelkmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "i659dmiemtoni3ge",
+      "items": []
+    },
+    {
+      "id": "wnnlyrflmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "8ptzwnqpmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "yc2dq8oomtoni3ge",
+      "items": []
+    },
+    {
+      "id": "swxe2c0jmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "j1q5w7fvmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "5myh0hz6mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "duqhl5aomtoni3ge",
+      "items": []
+    },
+    {
+      "id": "lhimo0v6mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ad8te0lfmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "sggcp29cmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "jaghhamjmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "piwvn965mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "13ewlrl5mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "5rbkzipymtoni3ge",
+      "items": []
+    },
+    {
+      "id": "yskfx7ctmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "8g12m6y6mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "81y7gjb6mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ys02muxnmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ncv5d8kzmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "esxiyl7rmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ilvoxrnjmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "egnb5qxrmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "mmxs23xamtoni3ge",
+      "items": []
+    },
+    {
+      "id": "wpgglz6kmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "l0hfpegmmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "46mmkscvmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "diqz12htmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "9e5b7mafmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "7pp9ku3hmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "f3gqnqjgmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "vdzaugfdmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "5crq4vbfmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "vg2euy2imtoni3ge",
+      "items": []
+    },
+    {
+      "id": "fknjo05omtoni3ge",
+      "items": []
+    },
+    {
+      "id": "00uxe18amtoni3ge",
+      "items": []
+    },
+    {
+      "id": "uepfio7dmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "hcvenua5mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "uvujukrxmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "s3dgqdoumtoni3ge",
+      "items": []
+    },
+    {
+      "id": "9x174ueimtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ltk4lwlbmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "2z65qsh7mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "0uonwk54mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "vvzt8gwtmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "48zx36g6mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "4dzz612xmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "9prhdyi0mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "92gcigggmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "b7u3rh5umtoni3ge",
+      "items": []
+    },
+    {
+      "id": "fk4lytvlmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "xs4mhfi5mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "kf4emr9gmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "k4egs2h4mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ktlj5hgdmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "iix80iwjmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "5gtvd0wymtoni3ge",
+      "items": []
+    },
+    {
+      "id": "d8fezsbgmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "gqgfby3emtoni3ge",
+      "items": []
+    },
+    {
+      "id": "0s865yarmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "2zebezlwmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "l3ea25mdmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ndor42fimtoni3ge",
+      "items": []
+    },
+    {
+      "id": "8dpq1kdnmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "k1tu254qmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ajt4dco2mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "lrvvluzsmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "a68h8f87mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ca8lrbjtmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "kpvwcai7mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "uh8djhnjmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "2b4iqf4nmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "n533zwqqmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "datwo3k2mtoni3ge",
+      "items": []
+    },
+    {
+      "id": "yunn78ftmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "wy451p1hmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "slcvhlhqmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "5thcr2pcmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ltty0xgumtoni3ge",
+      "items": []
+    },
+    {
+      "id": "6aasq7tfmtoni3ge",
+      "items": []
+    }
+  ]
+}

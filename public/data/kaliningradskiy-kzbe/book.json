@@ -1,0 +1,509 @@
+{
+  "format": "sketchbook/1",
+  "title": "Калининградский",
+  "widthMm": 148,
+  "heightMm": 210,
+  "coverColor": "#1f2933",
+  "year": 2026,
+  "shelf": 0,
+  "order": 1,
+  "createdAt": 1788614050906,
+  "updatedAt": 1788628441428,
+  "pages": [
+    {
+      "id": "3wvdbhocmtoemo7y",
+      "items": [
+        {
+          "id": "36j6o1p8mtoeqkbw",
+          "file": "images/36j6o1p8mtoeqkbw.jpg",
+          "thumb": "thumbs/36j6o1p8mtoeqkbw.jpg",
+          "x": -0.01532,
+          "y": -0.00415,
+          "w": 1.01707,
+          "h": 0.99502,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 912,
+          "ih": 1266
+        }
+      ]
+    },
+    {
+      "id": "sm2ob80ymtoemo7y",
+      "items": [
+        {
+          "id": "hpw2vn87mtoeqv66",
+          "file": "images/hpw2vn87mtoeqv66.jpg",
+          "thumb": "thumbs/hpw2vn87mtoeqv66.jpg",
+          "x": 0.00035,
+          "y": -0.00669,
+          "w": 1.00186,
+          "h": 1.01598,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 884,
+          "ih": 1272
+        }
+      ]
+    },
+    {
+      "id": "rkj3f5zjmtoemo7y",
+      "items": [
+        {
+          "id": "5qylhfnimtoer37o",
+          "file": "images/5qylhfnimtoer37o.jpg",
+          "thumb": "thumbs/5qylhfnimtoer37o.jpg",
+          "x": -0.01065,
+          "y": -0.00338,
+          "w": 1.02018,
+          "h": 1.00564,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 918,
+          "ih": 1284
+        }
+      ]
+    },
+    {
+      "id": "bnby10xvmtoemo7y",
+      "items": [
+        {
+          "id": "z55bhfcrmtoerfdy",
+          "file": "images/z55bhfcrmtoerfdy.jpg",
+          "thumb": "thumbs/z55bhfcrmtoerfdy.jpg",
+          "x": -0.01053,
+          "y": -0.02241,
+          "w": 1.01017,
+          "h": 1.03366,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 832,
+          "ih": 1208
+        }
+      ]
+    },
+    {
+      "id": "ueo7mxahmtoemo7y",
+      "items": [
+        {
+          "id": "zxrtwru5mtoerp14",
+          "file": "images/zxrtwru5mtoerp14.jpg",
+          "thumb": "thumbs/zxrtwru5mtoerp14.jpg",
+          "x": 0.00169,
+          "y": -0.0021,
+          "w": 1.02853,
+          "h": 1.0073,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 888,
+          "ih": 1234
+        }
+      ]
+    },
+    {
+      "id": "3ryr11a4mtoemo7y",
+      "items": [
+        {
+          "id": "41bi9opmmtoeryl8",
+          "file": "images/41bi9opmmtoeryl8.jpg",
+          "thumb": "thumbs/41bi9opmmtoeryl8.jpg",
+          "x": -0.00353,
+          "y": -0.00401,
+          "w": 0.99566,
+          "h": 1.00395,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 794,
+          "ih": 1136
+        }
+      ]
+    },
+    {
+      "id": "uryfqo05mtoemo7y",
+      "items": [
+        {
+          "id": "1axxka14mtoes66y",
+          "file": "images/1axxka14mtoes66y.jpg",
+          "thumb": "thumbs/1axxka14mtoes66y.jpg",
+          "x": 0.00001,
+          "y": 0.00061,
+          "w": 1.0121,
+          "h": 1.02915,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 822,
+          "ih": 1186
+        }
+      ]
+    },
+    {
+      "id": "1og1v6nqmtoemo7y",
+      "items": [
+        {
+          "id": "obxrw3chmtoesdx0",
+          "file": "images/obxrw3chmtoesdx0.jpg",
+          "thumb": "thumbs/obxrw3chmtoesdx0.jpg",
+          "x": -0.00744,
+          "y": 0.00251,
+          "w": 1.00944,
+          "h": 1.0163,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 798,
+          "ih": 1140
+        }
+      ]
+    },
+    {
+      "id": "8nhkoae9mtoemo7y",
+      "items": [
+        {
+          "id": "wgxsv8pymtoesl5k",
+          "file": "images/wgxsv8pymtoesl5k.jpg",
+          "thumb": "thumbs/wgxsv8pymtoesl5k.jpg",
+          "x": -0.0023,
+          "y": -0.00694,
+          "w": 1.06679,
+          "h": 1.03465,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 856,
+          "ih": 1178
+        }
+      ]
+    },
+    {
+      "id": "lrn48uc5mtoemo7y",
+      "items": [
+        {
+          "id": "vjblkml1mtoessrw",
+          "file": "images/vjblkml1mtoessrw.jpg",
+          "thumb": "thumbs/vjblkml1mtoessrw.jpg",
+          "x": -0.00231,
+          "y": -0.00573,
+          "w": 1.01283,
+          "h": 1.03703,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 848,
+          "ih": 1232
+        }
+      ]
+    },
+    {
+      "id": "20v5yabnmtoemo7y",
+      "items": [
+        {
+          "id": "zomfn6w6mtoeszn4",
+          "file": "images/zomfn6w6mtoeszn4.jpg",
+          "thumb": "thumbs/zomfn6w6mtoeszn4.jpg",
+          "x": -0.01285,
+          "y": 0.00143,
+          "w": 1.04926,
+          "h": 1.0099,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 886,
+          "ih": 1210
+        }
+      ]
+    },
+    {
+      "id": "bg1dz2oemtoemo7y",
+      "items": [
+        {
+          "id": "xll4fswbmtoet7z5",
+          "file": "images/xll4fswbmtoet7z5.jpg",
+          "thumb": "thumbs/xll4fswbmtoet7z5.jpg",
+          "x": -0.00146,
+          "y": 0.00005,
+          "w": 1.01716,
+          "h": 1.02205,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 808,
+          "ih": 1152
+        }
+      ]
+    },
+    {
+      "id": "1lc71cn4mtoemo7y",
+      "items": [
+        {
+          "id": "pdgpismsmtoetege",
+          "file": "images/pdgpismsmtoetege.jpg",
+          "thumb": "thumbs/pdgpismsmtoetege.jpg",
+          "x": -0.00508,
+          "y": 0.00066,
+          "w": 1.02304,
+          "h": 1.00455,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 834,
+          "ih": 1162
+        }
+      ]
+    },
+    {
+      "id": "9lhi2ci0mtoemo7y",
+      "items": [
+        {
+          "id": "iauac6l7mtoetnnz",
+          "file": "images/iauac6l7mtoetnnz.jpg",
+          "thumb": "thumbs/iauac6l7mtoetnnz.jpg",
+          "x": -0.00884,
+          "y": -0.0043,
+          "w": 1.04812,
+          "h": 1.0129,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 932,
+          "ih": 1278
+        }
+      ]
+    },
+    {
+      "id": "4u9smnvomtoemo7y",
+      "items": [
+        {
+          "id": "8cb4vjocmtoetv8i",
+          "file": "images/8cb4vjocmtoetv8i.jpg",
+          "thumb": "thumbs/8cb4vjocmtoetv8i.jpg",
+          "x": 0.0025,
+          "y": 0.00013,
+          "w": 1.0256,
+          "h": 1.00709,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 778,
+          "ih": 1084
+        }
+      ]
+    },
+    {
+      "id": "ccesoymhmtoemo7y",
+      "items": [
+        {
+          "id": "8g9z359lmtoeu2fu",
+          "file": "images/8g9z359lmtoeu2fu.jpg",
+          "thumb": "thumbs/8g9z359lmtoeu2fu.jpg",
+          "x": 0.00196,
+          "y": -0.00682,
+          "w": 0.99502,
+          "h": 1.01063,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 748,
+          "ih": 1078
+        }
+      ]
+    },
+    {
+      "id": "p2ajr1y0mtoemo7y",
+      "items": [
+        {
+          "id": "guuzpzmimtoeubz6",
+          "file": "images/guuzpzmimtoeubz6.jpg",
+          "thumb": "thumbs/guuzpzmimtoeubz6.jpg",
+          "x": -0.00676,
+          "y": -0.00342,
+          "w": 1.05886,
+          "h": 1.01824,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 856,
+          "ih": 1168
+        }
+      ]
+    },
+    {
+      "id": "sdwyhgjumtoemo7y",
+      "items": [
+        {
+          "id": "pkf0w3jqmtoeujvc",
+          "file": "images/pkf0w3jqmtoeujvc.jpg",
+          "thumb": "thumbs/pkf0w3jqmtoeujvc.jpg",
+          "x": -0.00425,
+          "y": 0.00094,
+          "w": 1.00621,
+          "h": 1.02308,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 768,
+          "ih": 1108
+        }
+      ]
+    },
+    {
+      "id": "jqag50ijmtoemo7y",
+      "items": [
+        {
+          "id": "gmh7603kmtoeuqsw",
+          "file": "images/gmh7603kmtoeuqsw.jpg",
+          "thumb": "thumbs/gmh7603kmtoeuqsw.jpg",
+          "x": -0.00241,
+          "y": 0.00083,
+          "w": 1.03437,
+          "h": 1.00125,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 830,
+          "ih": 1140
+        }
+      ]
+    },
+    {
+      "id": "b27wwlnumtoemo7y",
+      "items": [
+        {
+          "id": "7i4vi84rmtoeuz33",
+          "file": "images/7i4vi84rmtoeuz33.jpg",
+          "thumb": "thumbs/7i4vi84rmtoeuz33.jpg",
+          "x": -0.01007,
+          "y": -0.00016,
+          "w": 1.01619,
+          "h": 1.02526,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 760,
+          "ih": 1088
+        }
+      ]
+    },
+    {
+      "id": "y5gje25rmtoemo7y",
+      "items": [
+        {
+          "id": "u9eqx4ehmtoev5u7",
+          "file": "images/u9eqx4ehmtoev5u7.jpg",
+          "thumb": "thumbs/u9eqx4ehmtoev5u7.jpg",
+          "x": -0.00101,
+          "y": -0.00123,
+          "w": 1.01228,
+          "h": 1.0212,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 802,
+          "ih": 1148
+        }
+      ]
+    },
+    {
+      "id": "sv30l390mtoemo7y",
+      "items": []
+    },
+    {
+      "id": "012l9g9umtoemo7y",
+      "items": []
+    },
+    {
+      "id": "kaa5vpgcmtoemo7y",
+      "items": []
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   createBook,
   deleteBook,
@@ -401,6 +401,26 @@ export default function Shelf({ onOpen }) {
   }, [shelved, pxPerMm, wall.h, wall.w, artworks])
 
   /*
+   * Длина досок. Полка не может быть короче того, что на ней стоит, а две
+   * полки должны быть одной длины — иначе стена выглядит недостроенной.
+   * Поэтому меряем содержимое обеих и берём большее.
+   */
+  const [boardW, setBoardW] = useState(0)
+  useLayoutEffect(() => {
+    // Меряем сами вещи, а не строку, в которой они лежат: ширина строки уже
+    // зависит от того, что мы ей назначили, и полка запомнила бы своё
+    // прошлое состояние вместо настоящей длины содержимого.
+    const rows = [topLedgeRef.current, bottomLedgeRef.current].filter(Boolean).map((el) => {
+      const row = el.querySelector('.ledge-items')
+      const items = [...el.querySelectorAll('.ledge-items > li')]
+      if (!row || !items.length) return 0
+      const left = row.getBoundingClientRect().left
+      return Math.max(...items.map((i) => i.getBoundingClientRect().right)) - left + 12
+    })
+    if (rows.length) setBoardW(Math.round(Math.max(...rows)))
+  }, [ledges, wall.w])
+
+  /*
    * Перестановка работ: тащим раму на другую и меняем их местами. Большая
    * работа стоит на полу отдельно и в обмене не участвует. Расстановка
    * запоминается по именам файлов, поэтому переживает перезагрузку.
@@ -554,6 +574,7 @@ export default function Shelf({ onOpen }) {
                 left: ledges.big.w + 56,
                 // полки не доходят до правого края: там висит колонка рамок
                 right: Math.max(...ledges.spare.map((s2) => s2.w)) + 64,
+                minWidth: boardW || undefined,
               }}
               ref={ledge.ref}
             >
