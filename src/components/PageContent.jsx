@@ -9,15 +9,20 @@ import ItemView from './ItemView.jsx'
  *
  * thumbs — режим для ленты и обзора: берём уменьшенные копии, иначе сотня
  * страниц заставит браузер декодировать сотню полноразмерных снимков.
+ *
+ * images=false — страница вообще без картинок. Нужно для дальних листов
+ * стопки: браузер выкачивает все запрошенные картинки разом, и на медленном
+ * канале десяток дальних страниц отнимает канал у той, которую сейчас смотрят.
+ * Тогда разворот приходит последним, а до него мелькают случайные страницы.
  */
-function PageContent({ page, number, showNumber = true, side = 'right', thumbs = false }) {
+function PageContent({ page, number, showNumber = true, side = 'right', thumbs = false, images = true }) {
   if (!page) return null
-  const items = page.items || []
+  const items = images ? page.items || [] : []
   const pick = (full, small) => (thumbs ? small || full : full)
 
   return (
     <div className="page-content">
-      {page.blob && (
+      {images && page.blob && (
         <img
           className="page-scan"
           src={blobUrl(pick(page.blob, page.thumb))}

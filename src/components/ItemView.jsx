@@ -31,6 +31,7 @@ export default function ItemView({ item, thumbs = false, onLoad }) {
         draggable={false}
         decoding="async"
         loading={thumbs ? 'lazy' : 'eager'}
+        fetchPriority={thumbs ? 'low' : 'high'}
         onLoad={onLoad}
         style={style}
       />
@@ -39,12 +40,20 @@ export default function ItemView({ item, thumbs = false, onLoad }) {
 
   return (
     <>
-      <img src={blobUrl(small)} alt="" draggable={false} decoding="async" style={style} />
+      <img
+        src={blobUrl(small)}
+        alt=""
+        draggable={false}
+        decoding="async"
+        fetchPriority="high"
+        style={style}
+      />
       <img
         src={blobUrl(full)}
         alt=""
         draggable={false}
         decoding="async"
+        fetchPriority="high"
         onLoad={(e) => {
           setSharp(true)
           onLoad?.(e)

@@ -23,6 +23,7 @@ import { Confirm, NumberAsk } from './Dialog.jsx'
  */
 
 const WINDOW = 6 // сколько листов держим смонтированными по каждую сторону
+const NEAR = 2 // а на скольких из них есть картинки: остальные — чистая бумага
 
 /*
  * Стопка под разворотом. Каждый следующий лист выступает чуть меньше
@@ -147,6 +148,19 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   // листания считается по текущему списку страниц, и цель обрезалась бы
   // старым концом книжки. Поэтому запоминаем цель и прыгаем следующим кадром.
   const [pendingPage, setPendingPage] = useState(null)
+
+  /*
+   * Полные снимки берём сначала только для двух страниц, которые сейчас видно,
+   * а соседние листы догружаем, когда листание остановилось. На узком канале
+   * это разница между «разворот стал резким за секунду» и «шесть страниц
+   * качаются разом, и первой доезжает случайная».
+   */
+  const [wide, setWide] = useState(false)
+  useEffect(() => {
+    setWide(false)
+    const t = setTimeout(() => setWide(true), 900)
+    return () => clearTimeout(t)
+  }, [index])
 
   const pickPage = useCallback(
     (p) => {
@@ -681,6 +695,13 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
     setEditing(next)
   }
 
+  // Лицо, которое сейчас смотрит на зрителя: слева — оборот листа index-1,
+  // справа — лицо листа index. Им и достаётся полный снимок.
+  const full = (i, side) => {
+    if (wide) return Math.abs(i - index) <= 1
+    return (i === index - 1 && side === 'back') || (i === index && side === 'front')
+  }
+
   const from = Math.max(0, index - WINDOW)
   const to = Math.min(leaves - 1, index + WINDOW)
   const visibleLeaves = []
@@ -826,20 +847,23 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                       else leafEls.current.delete(i)
                     }}
                   >
-                    {/* Ближние листы рисуем полными снимками, дальние —
-                        миниатюрами: пустых страниц при листании быть не должно,
-                        но и декодировать десяток полноразмерных снимков незачем. */}
+                    {/* Три степени подробности. Разворот и его соседи — полные
+                        снимки, следующие два листа — миниатюры про запас,
+                        дальше бумага пустая. Канал у зрителя бывает узкий,
+                        и он должен уходить на ту страницу, которую смотрят. */}
                     <Face
                       slot={slots[i * 2]}
                       side="front"
                       book={book}
-                      thumbs={Math.abs(i - index) > 1}
+                      thumbs={!full(i, 'front')}
+                      images={Math.abs(i - index) <= NEAR}
                     />
                     <Face
                       slot={slots[i * 2 + 1]}
                       side="back"
                       book={book}
-                      thumbs={Math.abs(i - index) > 1}
+                      thumbs={!full(i, 'back')}
+                      images={Math.abs(i - index) <= NEAR}
                     />
                   </div>
                 ))}
@@ -859,6 +883,9 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
               aspect={aspect}
               onPick={pickPage}
               onDelete={EDITOR ? askDeletePage : null}
+              /* лента ждёт, пока развернётся сам разворот: сто миниатюр разом
+                 отбирают канал у страницы, которую сейчас смотрят */
+              images={wide}
             />
           )}
         </>
@@ -933,7 +960,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   )
 }
 
-function Face({ slot, side, book, thumbs = false }) {
+function Face({ slot, side, book, thumbs = false, images = true }) {
   const kind = slot?.kind ?? 'empty'
   const isCover = kind === 'cover' || kind === 'backcover'
   return (
@@ -955,6 +982,7 @@ function Face({ slot, side, book, thumbs = false }) {
           number={slot.number}
           side={side === 'front' ? 'right' : 'left'}
           thumbs={thumbs}
+          images={images}
         />
       )}
       <div className="face-gutter" />

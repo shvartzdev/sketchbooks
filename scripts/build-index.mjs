@@ -11,7 +11,7 @@ import sharp from 'sharp'
  * на экране они всё равно ужимаются, а на медленном канале страница едет
  * секундами. Поэтому при сборке из каждого скана делаются две копии:
  *
- *   web/<id>.webp    1200 px — то, что видно на развороте и крупно
+ *   web/<id>.webp    1000 px — то, что видно на развороте и крупно
  *   mini/<id>.webp    220 px — лента страниц, обзор, обложки на телефоне
  *
  * Копии в git не попадают: они выводятся из оригинала и живут только внутри
@@ -22,7 +22,7 @@ import sharp from 'sharp'
  */
 
 const DATA = path.resolve('public/data')
-const WEB = { dir: 'web', side: 1200, quality: 72 }
+const WEB = { dir: 'web', side: 1000, quality: 70 }
 const MINI = { dir: 'mini', side: 220, quality: 62 }
 
 const readJson = async (file) => JSON.parse(await readFile(file, 'utf8'))

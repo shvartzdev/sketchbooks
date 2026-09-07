@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from 'react'
 import PageContent from './PageContent.jsx'
 
-function PageRail({ pages, active, selected, aspect = 1, onPick, onDelete }) {
+function PageRail({ pages, active, selected, aspect = 1, onPick, onDelete, images = true }) {
   const railRef = useRef(null)
   const activeRef = useRef(null)
   const first = active[0]
@@ -32,7 +32,7 @@ function PageRail({ pages, active, selected, aspect = 1, onPick, onDelete }) {
               onClick={() => onPick(i)}
               title={`Страница ${i + 1}`}
             >
-              <PageContent page={page} showNumber={false} thumbs />
+              <PageContent page={page} showNumber={false} thumbs images={images} />
             </button>
           )
         })}
