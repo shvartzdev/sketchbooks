@@ -144,6 +144,13 @@ export async function exportBook(bookId, dirHandle, onProgress) {
     manifest.pages.push({ id: page.id, items })
   }
 
+  // Закладки держатся за страницу, а в файле страница — это её место в списке:
+  // при переносе на другую машину у страниц будут новые id, а порядок тот же.
+  const pageIndex = new Map(pages.map((p, i) => [p.id, i]))
+  manifest.bookmarks = (book.bookmarks || [])
+    .filter((b) => pageIndex.has(b.pageId))
+    .map((b) => ({ id: b.id, title: b.title, color: b.color, page: pageIndex.get(b.pageId) }))
+
   await writeFile(
     bookDir,
     'book.json',
@@ -232,10 +239,13 @@ async function importOne(bookDir, onProgress) {
     pages.push({ items })
   }
 
-  await addPages(book.id, pages)
+  const created = await addPages(book.id, pages)
   // место на полке приезжает вместе с книжкой: после git clone стена
   // собирается ровно такой, какой её оставили
   await updateBook(book.id, {
+    bookmarks: (manifest.bookmarks || [])
+      .filter((b) => created[b.page])
+      .map((b) => ({ id: b.id, title: b.title, color: b.color, pageId: created[b.page].id })),
     slug: bookDir.name,
     shelf: manifest.shelf ?? undefined,
     order: manifest.order ?? undefined,

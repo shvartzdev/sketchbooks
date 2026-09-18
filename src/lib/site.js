@@ -86,6 +86,10 @@ export function siteBook(slug) {
         }
       }),
     }))
+    // закладки в файле держатся за номер страницы — здесь снова за её id
+    book.bookmarks = (manifest.bookmarks || [])
+      .filter((b) => pages[b.page])
+      .map((b) => ({ id: b.id, title: b.title, color: b.color, pageId: pages[b.page].id }))
     return { book, pages }
   })()
   cache.set(slug, promise)

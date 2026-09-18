@@ -13,6 +13,7 @@ import PageRail from './PageRail.jsx'
 import PageContent from './PageContent.jsx'
 import PageEditor from './PageEditor.jsx'
 import PageZoom from './PageZoom.jsx'
+import BookmarksPanel from './BookmarksPanel.jsx'
 import { Confirm, NumberAsk } from './Dialog.jsx'
 
 /*
@@ -56,6 +57,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   const [editing, setEditing] = useState(null) // индекс страницы, открытой крупно
   const [ask, setAsk] = useState(null)
   const [zoom, setZoom] = useState(null) // страница, открытая крупно (витрина)
+  const [marksOpen, setMarksOpen] = useState(false) // панель закладок
   const [preload, setPreload] = useState(null) // { done, total } — довозим книжку
   const [renaming, setRenaming] = useState(false)
   const [notice, setNotice] = useState(null) // что не удалось прочитать
@@ -84,6 +86,21 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
     ]
   }, [pages])
   const leaves = slots.length / 2
+
+  /*
+   * Закладки держатся за страницу по её id: вставят страницы раньше — закладка
+   * уедет вместе со своей страницей. Здесь же решаем, на каком она листе и
+   * какая по счёту вдоль обреза, чтобы стикеры не налезали друг на друга.
+   */
+  const marks = useMemo(() => {
+    if (!book) return []
+    const at = new Map(pages.map((p, i) => [p.id, i]))
+    return (book.bookmarks || [])
+      .filter((b) => at.has(b.pageId))
+      .map((b) => ({ ...b, page: at.get(b.pageId) }))
+      .sort((a, b) => a.page - b.page)
+      .map((b, k) => ({ ...b, k, leaf: Math.floor((b.page + COVER_SLOTS) / 2) }))
+  }, [book, pages])
   const maxTurn = pages.length === 0 ? 0 : leaves
   const leavesRef = useRef(leaves)
   leavesRef.current = leaves
@@ -653,6 +670,24 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
     [ensureEditable],
   )
 
+  const saveBookmarks = useCallback(
+    async (next) => {
+      setBook((b) => ({ ...b, bookmarks: next }))
+      await updateBook(bookId, { bookmarks: next })
+    },
+    [bookId],
+  )
+
+  const goToBookmark = useCallback(
+    (pageId) => {
+      const i = pages.findIndex((p) => p.id === pageId)
+      if (i < 0) return
+      setSelected(i)
+      goToPage(i)
+    },
+    [pages, goToPage],
+  )
+
   const saveItems = useCallback(async (pageId, items) => {
     setPages((prev) => prev.map((p) => (p.id === pageId ? { ...p, items } : p)))
     await updatePage(pageId, { items })
@@ -720,6 +755,33 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   const to = Math.min(leaves - 1, index + WINDOW)
   const visibleLeaves = []
   for (let i = from; i <= to; i++) visibleLeaves.push(i)
+  // Лист с закладкой нужен и далеко от разворота: у настоящей книжки стикер
+  // торчит из обреза, даже если его страница в самой глубине. Такой лист
+  // стоит без картинок — его всё равно не видно, кроме краешка со стикером.
+  for (const m of marks) {
+    if ((m.leaf < from || m.leaf > to) && !visibleLeaves.includes(m.leaf)) visibleLeaves.push(m.leaf)
+  }
+
+  /*
+   * Стикеры идут вдоль обреза сверху вниз, по порядку страниц. Длина у каждого
+   * своя — под название, чтобы его было видно целиком, но не длиннее четверти
+   * страницы. Не поместились в столбик — следующий начинается снова сверху.
+   */
+  const tabW = Math.max(16, Math.round(box.w * 0.075))
+  const tabGap = 5
+  const tabTop = Math.round(box.h * 0.05)
+  const tabPlace = new Map()
+  {
+    let y = tabTop
+    for (const m of marks) {
+      const h = Math.round(
+        Math.min(box.h * 0.25, Math.max(30, labelLength(m.title) + 16)),
+      )
+      if (y + h > box.h - tabTop && y > tabTop) y = tabTop
+      tabPlace.set(m.id, { top: y, height: h })
+      y += h + tabGap
+    }
+  }
 
   const aspect = book.widthMm / book.heightMm
 
@@ -770,6 +832,16 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                   : 'задняя обложка'}{' '}
               / {pages.length}
             </span>
+          )}
+          {EDITOR && (
+            <button
+              className={'btn' + (marksOpen ? ' btn-on' : '')}
+              data-bookmarks-toggle
+              onClick={() => setMarksOpen((v) => !v)}
+              disabled={!pages.length}
+            >
+              Закладки{marks.length ? ` · ${marks.length}` : ''}
+            </button>
           )}
           <button className="btn" onClick={() => setOverview((v) => !v)} disabled={!pages.length}>
             {overview ? 'Листать' : 'Все страницы'}
@@ -865,8 +937,47 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                         нечего. Разница только в весе: две видимые страницы
                         берут полный снимок, остальные обходятся миниатюрой
                         в пару килобайт, которая и так нужна для ленты. */}
-                    <Face slot={slots[i * 2]} side="front" book={book} thumbs={!full(i, 'front')} />
-                    <Face slot={slots[i * 2 + 1]} side="back" book={book} thumbs={!full(i, 'back')} />
+                    <Face
+                      slot={slots[i * 2]}
+                      side="front"
+                      book={book}
+                      thumbs={!full(i, 'front')}
+                      bare={i < from || i > to}
+                    />
+                    <Face
+                      slot={slots[i * 2 + 1]}
+                      side="back"
+                      book={book}
+                      thumbs={!full(i, 'back')}
+                      bare={i < from || i > to}
+                    />
+                    {marks
+                      .filter((m) => m.leaf === i)
+                      .map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          className="leaf-tab"
+                          data-no-drag
+                          title={`${m.title} — стр. ${m.page + 1}`}
+                          style={{
+                            ...tabPlace.get(m.id),
+                            width: tabW + 6,
+                            '--tab': m.color,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            goToBookmark(m.pageId)
+                          }}
+                        >
+                          <span className="leaf-tab-face leaf-tab-front">
+                            <span>{m.title}</span>
+                          </span>
+                          <span className="leaf-tab-face leaf-tab-back">
+                            <span>{m.title}</span>
+                          </span>
+                        </button>
+                      ))}
                   </div>
                 ))}
               </div>
@@ -910,6 +1021,17 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
         <button className="toast toast-warn" onClick={() => setNotice(null)}>
           {notice}
         </button>
+      )}
+
+      {EDITOR && marksOpen && (
+        <BookmarksPanel
+          bookmarks={book.bookmarks || []}
+          pages={pages}
+          current={selected}
+          onChange={saveBookmarks}
+          onGo={goToBookmark}
+          onClose={() => setMarksOpen(false)}
+        />
       )}
 
       {zoom !== null && (
@@ -969,7 +1091,16 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   )
 }
 
-function Face({ slot, side, book, thumbs = false }) {
+// Длина подписи на стикере: шрифт 10 px, полужирный — меряем настоящими буквами.
+let labelCtx = null
+function labelLength(text) {
+  if (!labelCtx) labelCtx = document.createElement('canvas').getContext('2d')
+  const family = getComputedStyle(document.body).fontFamily.replace('-apple-system', 'system-ui')
+  labelCtx.font = `600 10px ${family}`
+  return labelCtx.measureText(text || '').width + (text || '').length * 0.2
+}
+
+function Face({ slot, side, book, thumbs = false, bare = false }) {
   const kind = slot?.kind ?? 'empty'
   const isCover = kind === 'cover' || kind === 'backcover'
   return (
@@ -985,7 +1116,7 @@ function Face({ slot, side, book, thumbs = false }) {
           </span>
         </div>
       )}
-      {kind === 'page' && (
+      {kind === 'page' && !bare && (
         <PageContent
           page={slot.page}
           number={slot.number}
