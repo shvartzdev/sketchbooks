@@ -993,50 +993,65 @@ input[type='text'], input[type='number'], .field input {
 /* ---------- закладки ---------- */
 
 /*
- * Стикер-закладка: наклеен на край листа и торчит из обреза. Он часть листа —
- * поворачивается вместе с ним, поэтому у него две стороны, как у бумажки:
- * лицевая видна справа, оборотная — когда лист лёг налево.
+ * Закладка-ленточка, как ляссе в книгах: вложена в страницу и торчит из
+ * обреза, название поперёк, кончик раздвоен ласточкиным хвостом. Она часть
+ * листа — поворачивается вместе с ним, поэтому у неё две стороны: лицевая
+ * видна справа, оборотная — когда лист лёг налево.
  */
 .leaf-tab {
   position: absolute;
-  left: calc(100% - 6px); /* 6 px заходят на страницу — там он приклеен */
+  left: calc(100% - 6px); /* 6 px уходят под край страницы — там она вложена */
   padding: 0;
   border: 0;
   background: none;
   transform-style: preserve-3d;
   cursor: pointer;
+  /* никаких filter здесь: фильтр сплющивает обе стороны в одну плоскость,
+     и перевёрнутый лист показывал бы лицевую сторону зеркально */
 }
+/* сторона ленточки: своя тень — у неё самой, а не у всей закладки */
 .leaf-tab-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+}
+.leaf-tab-front { transform: translateZ(0.4px); }
+.leaf-tab-back { transform: rotateY(180deg) translateZ(0.4px); }
+
+/* сама ленточка: атласный отлив и раздвоенный кончик на внешнем конце */
+.ribbon {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  border-radius: 0 4px 4px 0;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0) 7px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(255, 255, 255, 0.22) 45%,
+      rgba(255, 255, 255, 0.05) 60%, rgba(0, 0, 0, 0.2) 100%),
     var(--tab);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
-/* чуть над плоскостью листа, иначе стикер мерцает, сливаясь со страницей */
-.leaf-tab-front { transform: translateZ(0.4px); }
-.leaf-tab-back { transform: rotateY(180deg) translateZ(0.4px); border-radius: 4px 0 0 4px; }
-.leaf-tab-face > span {
-  writing-mode: vertical-rl;
-  max-height: calc(100% - 8px);
-  padding-left: 5px; /* подпись — на той части, что торчит, а не под страницей */
+.leaf-tab-front .ribbon {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%);
+  justify-content: flex-start;
+}
+/* у оборотной стороны внешний конец слева — туда и хвост */
+.leaf-tab-back .ribbon {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0.55em 50%);
+  justify-content: flex-end;
+}
+.ribbon > span {
+  padding: 0 1.1em 0 calc(6px + 0.5em); /* начинается от края страницы */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(28, 24, 18, 0.82);
+  line-height: 1;
+  color: rgba(24, 20, 14, 0.85);
 }
-.leaf-tab-back > span { padding-left: 0; padding-right: 5px; }
-.leaf-tab:hover .leaf-tab-face { filter: brightness(1.07); }
+.leaf-tab-back .ribbon > span { padding: 0 calc(6px + 0.5em) 0 1.1em; }
+.leaf-tab:hover .ribbon { filter: brightness(1.07); }
 
 /* панель закладок */
 .bookmarks-panel {

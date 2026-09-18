@@ -338,7 +338,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
       // ход листания: столько пикселей ведения — один лист; дальше по сцене
       // включается непрерывная прокрутка
       strideRef.current = Math.max(60, Math.min(140, rect.width * 0.09))
-      setBox({ w: Math.round(w / 2), h: Math.round(h) })
+      setBox({ w: Math.round(w / 2), h: Math.round(h), stage: Math.round(rect.width) })
     }
     measure()
     const ro = new ResizeObserver(measure)
@@ -763,25 +763,34 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   }
 
   /*
-   * Стикеры идут вдоль обреза сверху вниз, по порядку страниц. Длина у каждого
-   * своя — под название, чтобы его было видно целиком, но не длиннее четверти
-   * страницы. Не поместились в столбик — следующий начинается снова сверху.
+   * Закладки — ленточки, как ляссе в книгах: узкая полоска торчит из обреза,
+   * название на ней пишется поперёк, кончик раздвоен. Идут столбиком вдоль
+   * обреза по порядку страниц; если закладок больше, чем помещается,
+   * ленточки сближаются, но не ложатся одна на другую целиком.
+   *
+   * Длина — под название, но не дальше края экрана: на телефоне по бокам
+   * разворота места почти нет, и там название сокращается.
    */
-  const tabW = Math.max(16, Math.round(box.w * 0.075))
-  const tabGap = 5
-  const tabTop = Math.round(box.h * 0.05)
-  const tabPlace = new Map()
-  {
-    let y = tabTop
-    for (const m of marks) {
-      const h = Math.round(
-        Math.min(box.h * 0.25, Math.max(30, labelLength(m.title) + 16)),
-      )
-      if (y + h > box.h - tabTop && y > tabTop) y = tabTop
-      tabPlace.set(m.id, { top: y, height: h })
-      y += h + tabGap
-    }
-  }
+  const ribbonH = Math.max(14, Math.min(20, Math.round(box.h * 0.075)))
+  const ribbonFont = Math.round(ribbonH * 0.58 * 10) / 10
+  const ribbonTop = Math.round(box.h * 0.06)
+  const room = Math.max(30, Math.floor(((box.stage || 0) - box.w * 2) / 2) - 10)
+  const ribbonStep = (() => {
+    const free = box.h - ribbonTop * 2 - ribbonH
+    const step = ribbonH + 3
+    if (marks.length < 2 || (marks.length - 1) * step <= free) return step
+    return Math.max(ribbonH * 0.55, free / (marks.length - 1))
+  })()
+  const tabPlace = new Map(
+    marks.map((m, k) => [
+      m.id,
+      {
+        top: ribbonTop + k * ribbonStep,
+        height: ribbonH,
+        width: Math.min(room, Math.round(labelLength(m.title, ribbonFont) + 26)) + 6,
+      },
+    ]),
+  )
 
   const aspect = book.widthMm / book.heightMm
 
@@ -962,7 +971,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                           title={`${m.title} — стр. ${m.page + 1}`}
                           style={{
                             ...tabPlace.get(m.id),
-                            width: tabW + 6,
+                            fontSize: ribbonFont,
                             '--tab': m.color,
                           }}
                           onClick={(e) => {
@@ -971,10 +980,14 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
                           }}
                         >
                           <span className="leaf-tab-face leaf-tab-front">
-                            <span>{m.title}</span>
+                            <span className="ribbon">
+                              <span>{m.title}</span>
+                            </span>
                           </span>
                           <span className="leaf-tab-face leaf-tab-back">
-                            <span>{m.title}</span>
+                            <span className="ribbon">
+                              <span>{m.title}</span>
+                            </span>
                           </span>
                         </button>
                       ))}
@@ -1091,13 +1104,13 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
   )
 }
 
-// Длина подписи на стикере: шрифт 10 px, полужирный — меряем настоящими буквами.
+// Длина подписи на ленточке — меряем настоящими буквами.
 let labelCtx = null
-function labelLength(text) {
+function labelLength(text, size = 10) {
   if (!labelCtx) labelCtx = document.createElement('canvas').getContext('2d')
   const family = getComputedStyle(document.body).fontFamily.replace('-apple-system', 'system-ui')
-  labelCtx.font = `600 10px ${family}`
-  return labelCtx.measureText(text || '').width + (text || '').length * 0.2
+  labelCtx.font = `600 ${size}px ${family}`
+  return labelCtx.measureText(text || '').width + (text || '').length * size * 0.02
 }
 
 function Face({ slot, side, book, thumbs = false, bare = false }) {
