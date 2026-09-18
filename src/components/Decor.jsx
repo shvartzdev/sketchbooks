@@ -149,9 +149,11 @@ export function housesFor(seed, count, unit) {
  * рамка не выглядела как большая, только уменьшенная.
  */
 export function Painting({ item }) {
+  // багет и паспарту обычно выводятся из размера рамы, но если раму считали
+  // изнутри — от пропорций работы, — берём ровно те поля, под которые она сложена
   const side = Math.min(item.w || item.h, item.h)
-  const frame = Math.max(7, Math.round(side * 0.045))
-  const mat = Math.max(9, Math.round(side * 0.075))
+  const frame = item.frame ?? Math.max(7, Math.round(side * 0.045))
+  const mat = item.mat ?? Math.max(9, Math.round(side * 0.075))
 
   return (
     <span

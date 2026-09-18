@@ -56,6 +56,90 @@ const spineWidth = (pages) => Math.round(Math.min(64, Math.max(24, 12 + pages * 
 // на узком корешке шрифт мельче, иначе название не влезает в две строки
 const titleSize = (w) => Math.max(9, Math.min(13, Math.round(w * 0.38 * 10) / 10))
 
+const TOP_LEDGE = 0.52 // доля высоты стены, на которой висит верхняя полка
+const LEDGE_GAP = 10 // промежуток между вещами на полке, из CSS
+const LEDGE_PAD = 24 // поля полки слева и справа, из CSS
+const BORDER = 0.12 // багет + паспарту — доля короткой стороны рамы
+
+/*
+ * Рама изнутри наружу, как у настоящей: работа своих пропорций, вокруг неё
+ * ровное поле паспарту, снаружи багет. Задана только внешняя высота — ширина
+ * получается сама, и в окне паспарту работа сидит ровно, без пустот.
+ */
+function frameAround(aspect, outerH) {
+  // поле считаем от короткой стороны рамы; у вертикальной работы это ширина,
+  // которая сама зависит от поля, — отсюда формула, а не простая доля
+  const b =
+    aspect >= 1
+      ? BORDER * outerH
+      : (BORDER * aspect * outerH) / (1 - 2 * BORDER + 2 * BORDER * aspect)
+  const frame = Math.max(4, Math.round(b * 0.375))
+  const mat = Math.max(5, Math.round(b * 0.625))
+  const edge = frame + mat
+  const h = Math.round(outerH)
+  const w = Math.round((h - 2 * edge) * aspect) + 2 * edge
+  return { h, w, frame, mat }
+}
+
+/*
+ * Вся стена для заданной высоты: масштаб, большая работа, колонка рамок,
+ * вещи на полках — и сколько ширины на это нужно.
+ */
+function buildWall(H, { shelved, artworks, summaries }) {
+  // Масштаб задаёт работа: два A4 по вертикали занимают три четверти стены,
+  // книжка A4 выходит вдвое меньше.
+  const pxPerMm = (H * 0.75) / 594
+  const mm = (v) => Math.round(v * pxPerMm)
+  const bigH = Math.round(TOP_LEDGE * H + BOARD_H + 297 * pxPerMm - FLOOR)
+
+  const aspectOf = (art) => art.aspect || art.widthMm / art.heightMm
+  const frame = (art, big = false) => {
+    const aspect = aspectOf(art)
+    return {
+      kind: 'art',
+      id: art.name || `empty-${art.heightMm}x${art.widthMm}`,
+      art,
+      ...frameAround(aspect, big ? bigH : mm(art.heightMm)),
+      // светлое поле идёт не всем: большой работе и квадрату — тёмное
+      dark: big || Math.abs(aspect - 1) < 0.1,
+    }
+  }
+
+  // Три пустые рамки колонкой у правого края: верх первой вровень с верхом
+  // большой работы, низ последней — с её низом.
+  const gap = Math.round(bigH * 0.05)
+  const slotH = Math.round((bigH - gap * 2) / 3)
+  const spareW = Math.round(slotH * 0.8)
+  const spare = ['a', 'b', 'c'].map((key) => ({
+    id: `spare-${key}`,
+    h: slotH,
+    w: spareW,
+    widthMm: Math.round(spareW / pxPerMm),
+    heightMm: Math.round(slotH / pxPerMm),
+  }))
+
+  const small = artworks.small.length ? artworks.small : EMPTY_ART.small
+  const framed = small.map((art, i) => ({ ...frame(art), slot: String(i) }))
+  const book = (b, shelf, pos) => ({
+    kind: 'book',
+    id: b.id,
+    book: b,
+    shelf,
+    pos,
+    w: spineWidth(summaries[b.id]?.count ?? 0),
+  })
+
+  const top = [...shelved[0].map((b, i) => book(b, 0, i)), ...framed.slice(0, 2)]
+  const bottom = [...shelved[1].map((b, i) => book(b, 1, i)), ...framed.slice(2)]
+  const big = frame(artworks.big || EMPTY_ART.big, true)
+
+  const row = (items) =>
+    LEDGE_PAD + items.reduce((sum, it) => sum + it.w, 0) + LEDGE_GAP * Math.max(0, items.length - 1)
+  const need = big.w + 56 + Math.max(row(top), row(bottom)) + 64 + spareW
+
+  return { H: Math.round(H), pxPerMm, need, spare, spareGap: gap, big, top, bottom }
+}
+
 export default function Shelf({ onOpen }) {
   const [books, setBooks] = useState(null)
   const [summaries, setSummaries] = useState({})
@@ -109,12 +193,6 @@ export default function Shelf({ onOpen }) {
     }
   }, [books])
 
-  // Развеска как на стене: две длинные рейки во всю ширину. Масштаб задаёт
-  // работа — два A4 по вертикали занимают три четверти высоты стены, книжка A4
-  // выходит вдвое меньше, предметы — мелочь между ними.
-  const pxPerMm = (wall.h * 0.75) / 594
-  const TOP_LEDGE = 0.52 // доля высоты стены, на которой висит верхняя полка
-  const spineHeight = useCallback((mm) => Math.round(mm * pxPerMm), [pxPerMm])
 
 
   // Работы из подпапки art привязанной папки: читаем файлы, узнаём пропорции
@@ -351,54 +429,24 @@ export default function Shelf({ onOpen }) {
   /*
    * Что стоит на полках. Нижняя работа у левого края — самая крупная, стоит
    * на полу; остальные работы висят на полках вперемешку с книжками.
+   *
+   * Стена считается для высоты окна, а если по ширине не влезает — целиком
+   * ужимается, пока не влезет. Пропорции и выравнивания при этом те же:
+   * меняется только общий масштаб.
    */
   const ledges = useMemo(() => {
-    const mm = (v) => Math.round(v * pxPerMm)
-    const bigH = Math.round(TOP_LEDGE * wall.h + BOARD_H + 297 * pxPerMm - FLOOR)
-    const frame = (art, big = false) => {
-      const h = big ? bigH : mm(art.heightMm)
-      const w = art.aspect ? Math.round(h * art.aspect) : mm(art.widthMm)
-      return {
-        kind: 'art',
-        id: art.name || `empty-${art.heightMm}x${art.widthMm}`,
-        art,
-        h,
-        w: Math.min(w, Math.round(wall.w * 0.4)),
-        // светлое поле идёт не всем: большой работе и квадрату — тёмное
-        dark: big || Math.abs(art.widthMm - art.heightMm) < 20,
-      }
+    const input = { shelved, artworks, summaries }
+    let H = wall.h
+    let layout = buildWall(H, input)
+    for (let i = 0; i < 4 && layout.need > wall.w; i++) {
+      H = Math.max(260, (H * wall.w) / layout.need)
+      layout = buildWall(H, input)
     }
+    return layout
+  }, [shelved, artworks, summaries, wall.h, wall.w])
 
-    // Три пустые рамки колонкой у правого края: верх первой вровень с верхом
-    // большой работы, низ последней — с её низом.
-    const gap = Math.round(bigH * 0.05)
-    const slotH = Math.round((bigH - gap * 2) / 3)
-    const spareW = Math.round(slotH * 0.8)
-    const spare = ['a', 'b', 'c'].map((key) => ({
-      id: `spare-${key}`,
-      h: slotH,
-      w: spareW,
-      widthMm: Math.round(spareW / pxPerMm),
-      heightMm: Math.round(slotH / pxPerMm),
-    }))
-
-    const small = artworks.small.length ? artworks.small : EMPTY_ART.small
-    const framed = small.map((art, i) => ({ ...frame(art), slot: String(i) }))
-
-    return {
-      spare,
-      spareGap: gap,
-      big: frame(artworks.big || EMPTY_ART.big, true),
-      top: [
-        ...shelved[0].map((book, i) => ({ kind: 'book', id: book.id, book, shelf: 0, pos: i })),
-        ...framed.slice(0, 2),
-      ],
-      bottom: [
-        ...shelved[1].map((book, i) => ({ kind: 'book', id: book.id, book, shelf: 1, pos: i })),
-        ...framed.slice(2),
-      ],
-    }
-  }, [shelved, pxPerMm, wall.h, wall.w, artworks])
+  const pxPerMm = ledges.pxPerMm
+  const spineHeight = (mm) => Math.round(mm * pxPerMm)
 
   /*
    * Длина досок. Полка не может быть короче того, что на ней стоит, а две
@@ -539,7 +587,7 @@ export default function Shelf({ onOpen }) {
           onEdit={EDITOR ? setEditing : null}
         />
       ) : (
-        <div className="wall" style={{ height: wall.h }} ref={rowRef}>
+        <div className="wall" style={{ height: ledges.H }} ref={rowRef}>
           {/* колонка пустых рамок справа: ровно по высоте большой работы */}
           <div className="spare-column" style={{ bottom: FLOOR, gap: ledges.spareGap }}>
             {ledges.spare.map((sp) => (
@@ -779,6 +827,8 @@ function ArtFrame({ item }) {
         src: item.art?.src ?? null,
         w: item.w,
         h: item.h,
+        frame: item.frame,
+        mat: item.mat,
         dark: item.dark,
         hint: `${item.art?.widthMm ?? ''}×${item.art?.heightMm ?? ''}`,
       }}
