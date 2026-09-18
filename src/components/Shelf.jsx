@@ -56,6 +56,69 @@ const spineWidth = (pages) => Math.round(Math.min(64, Math.max(24, 12 + pages * 
 // на узком корешке шрифт мельче, иначе название не влезает в две строки
 const titleSize = (w) => Math.max(9, Math.min(13, Math.round(w * 0.38 * 10) / 10))
 
+// Толщина выше подобрана для стены обычного размера. Когда стена ужимается,
+// книжки должны становиться тоньше вместе с ней — иначе они выходят
+// короткими и толстыми, будто это другие книжки.
+const REF_PX_PER_MM = 0.93
+const spineWidthAt = (pages, pxPerMm) =>
+  Math.max(10, Math.round(spineWidth(pages) * Math.min(1.15, pxPerMm / REF_PX_PER_MM)))
+
+/*
+ * Размер названия под свой корешок. Текст идёт вдоль корешка, переносится
+ * только между словами и должен уложиться в его длину и толщину: подбираем
+ * самый крупный шрифт, при котором это выходит. Меряем настоящими буквами,
+ * а не на глаз, — на низких корешках счёт идёт на пиксели.
+ *
+ * Если название не влезает даже мелко, с корешка уходит год: название
+ * важнее, а год остаётся во всплывающей подсказке.
+ */
+let measureCtx = null
+function textWidth(text, size, weight = 600) {
+  if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d')
+  // холст не знает имени -apple-system, и без подмены мерил бы запасным,
+  // более узким шрифтом — название выходило бы длиннее расчёта
+  const family = getComputedStyle(document.body).fontFamily.replace('-apple-system', 'system-ui')
+  measureCtx.font = `${weight} ${size}px ${family}`
+  const spacing = weight === 600 ? text.length * size * 0.02 : 0 // letter-spacing названия
+  return measureCtx.measureText(text).width + spacing
+}
+
+const MIN_TITLE = 7
+
+function fitTitle(title, w, h, year) {
+  const words = (title || '').split(/\s+/).filter(Boolean)
+  const across = w - 6 // толщина под строки
+  const tryFit = (yearH) => {
+    const along = h - 20 - yearH - 4 // длина под текст: корешок без полей и года
+    for (let f = titleSize(w); f >= MIN_TITLE; f -= 0.5) {
+      if (words.some((word) => textWidth(word, f) > along)) continue
+      const space = textWidth(' ', f)
+      let lines = 1
+      let used = 0
+      for (const word of words) {
+        const add = (used ? space : 0) + textWidth(word, f)
+        if (used + add > along) {
+          lines++
+          used = textWidth(word, f)
+        } else used += add
+      }
+      if (lines * f * 1.25 <= across) return f
+    }
+    return null
+  }
+  // Год — строки по 12 px плюс черта над ними. Строка переносится ещё раз,
+  // если не влезает в свою колонку (62% толщины), а если цифры не помещаются
+  // и так — год на этом корешке не показываем.
+  const parts = yearLines(year)
+  const yearWidth = (part) => textWidth(part, 10, 400)
+  const yearFits = parts.every((part) => yearWidth(part.replace('–', '')) <= w - 2)
+  const lines = parts.reduce((n, part) => n + (yearWidth(part) > w - 2 ? 2 : 1), 0)
+  const withYear = !parts.length ? tryFit(0) : yearFits ? tryFit(lines * 12 + 6) : null
+  if (withYear) return { size: withYear, showYear: true }
+  const without = tryFit(0)
+  return { size: without ?? MIN_TITLE, showYear: false }
+}
+
 const TOP_LEDGE = 0.52 // доля высоты стены, на которой висит верхняя полка
 const LEDGE_GAP = 10 // промежуток между вещами на полке, из CSS
 const LEDGE_PAD = 24 // поля полки слева и справа, из CSS
@@ -126,7 +189,7 @@ function buildWall(H, { shelved, artworks, summaries }) {
     book: b,
     shelf,
     pos,
-    w: spineWidth(summaries[b.id]?.count ?? 0),
+    w: spineWidthAt(summaries[b.id]?.count ?? 0, pxPerMm),
   })
 
   const top = [...shelved[0].map((b, i) => book(b, 0, i)), ...framed.slice(0, 2)]
@@ -162,6 +225,7 @@ export default function Shelf({ onOpen }) {
   const [dragArt, setDragArt] = useState(null) // перетаскиваемая рама
   const dragRef = useRef(null)
   const rowRef = useRef(null)
+  const areaRef = useRef(null) // место под стену: от него считается высота
   const draggedAt = useRef(0)
   const topLedgeRef = useRef(null)
   const bottomLedgeRef = useRef(null)
@@ -176,12 +240,18 @@ export default function Shelf({ onOpen }) {
   }, [])
 
   // сетка стены меряется по месту: сколько рядов и столбцов поместилось
+  // Верх меряем у места под стену, а не у самой стены: стену мы сдвигаем
+  // к центру, и от её собственного верха высота начала бы гулять по кругу.
   useEffect(() => {
     const el = rowRef.current
-    if (!el) return
+    const area = areaRef.current
+    if (!el || !area) return
     const measure = () => {
-      const r = el.getBoundingClientRect()
-      setWall({ w: r.width, h: Math.max(320, window.innerHeight - r.top - 24) })
+      const top = area.getBoundingClientRect().top
+      setWall({
+        w: el.getBoundingClientRect().width,
+        h: Math.max(320, window.innerHeight - top - 24),
+      })
     }
     measure()
     const ro = new ResizeObserver(measure)
@@ -587,7 +657,13 @@ export default function Shelf({ onOpen }) {
           onEdit={EDITOR ? setEditing : null}
         />
       ) : (
-        <div className="wall" style={{ height: ledges.H }} ref={rowRef}>
+        <div ref={areaRef}>
+        {/* если стена ужалась по ширине, она встаёт посередине, а не липнет к верху */}
+        <div
+          className="wall"
+          style={{ height: ledges.H, marginTop: Math.max(0, Math.round((wall.h - ledges.H) / 2)) }}
+          ref={rowRef}
+        >
           {/* колонка пустых рамок справа: ровно по высоте большой работы */}
           <div className="spare-column" style={{ bottom: FLOOR, gap: ledges.spareGap }}>
             {ledges.spare.map((sp) => (
@@ -651,7 +727,8 @@ export default function Shelf({ onOpen }) {
                   const book = it.book
                   const count = summaries[book.id]?.count ?? 0
                   const h = spineHeight(book.heightMm)
-                  const w = spineWidth(count)
+                  const w = it.w // та же толщина, по которой считалась ширина полки
+                  const fit = fitTitle(book.title, w, h, book.year)
                   return (
                     <li
                       key={book.id}
@@ -673,12 +750,14 @@ export default function Shelf({ onOpen }) {
                           // отдаём положение корешка: с него начнётся перелёт обложки
                           onOpen(book.id, e.currentTarget.getBoundingClientRect(), book)
                         }}
-                        title={`${book.title} · ${book.widthMm}×${book.heightMm} мм · ${pagesLabel(count)}`}
+                        title={[book.title, book.year, `${book.widthMm}×${book.heightMm} мм`, pagesLabel(count)]
+                          .filter(Boolean)
+                          .join(' · ')}
                       >
-                        <span className="spine-title" style={{ fontSize: titleSize(w) }}>
+                        <span className="spine-title" style={{ fontSize: fit.size }}>
                           {book.title}
                         </span>
-                        {book.year && (
+                        {book.year && fit.showYear && (
                           <span className="spine-year">
                             {yearLines(book.year).map((line) => (
                               <span key={line}>{line}</span>
@@ -708,6 +787,7 @@ export default function Shelf({ onOpen }) {
               <div className="ledge-board" />
             </div>
           ))}
+        </div>
         </div>
       )}
 
