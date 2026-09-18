@@ -1001,9 +1001,6 @@ input[type='text'], input[type='number'], .field input {
 .leaf-tab {
   position: absolute;
   left: calc(100% - 6px); /* 6 px уходят под край страницы — там она вложена */
-  /* глубокая страница: ленточка длиннее у основания на столько, насколько
-     дальше выходит, — видимая часть с названием та же */
-  width: calc(var(--w) + var(--extra, 0) * 1px);
   padding: 0;
   border: 0;
   background: none;
@@ -1048,33 +1045,8 @@ input[type='text'], input[type='number'], .field input {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0.55em 50%);
   justify-content: flex-end;
 }
-/* края страниц, лежащих на основании ленточки: чем глубже, тем их больше */
-.ribbon::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  bottom: -1px;
-  left: 0;
-  width: var(--cover, 0px);
-  background: repeating-linear-gradient(90deg, #efe9dc 0 1.5px, #cdc5b3 1.5px 2px);
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.35);
-  z-index: 2;
-}
-/* тень от страниц сверху: густая у основания, к кончику сходит на нет */
-.ribbon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(10, 8, 6, var(--shade, 0)) 0%,
-    rgba(10, 8, 6, calc(var(--shade, 0) * 0.45)) 55%, rgba(10, 8, 6, calc(var(--shade, 0) * 0.3)) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-.leaf-tab-back .ribbon::before { left: auto; right: 0; box-shadow: -1px 0 3px rgba(0, 0, 0, 0.35); }
-.leaf-tab-back .ribbon::after { transform: scaleX(-1); }
 .ribbon > span {
-  position: relative;
-  padding: 0 1.1em 0 calc(var(--cover, 0px) + 0.5em); /* начинается там, где выходит из-под страниц */
+  padding: 0 1.1em 0 calc(6px + 0.5em); /* начинается от края страницы */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1083,7 +1055,7 @@ input[type='text'], input[type='number'], .field input {
   line-height: 1;
   color: rgba(24, 20, 14, 0.8);
 }
-.leaf-tab-back .ribbon > span { padding: 0 calc(var(--cover, 0px) + 0.5em) 0 1.1em; }
+.leaf-tab-back .ribbon > span { padding: 0 calc(6px + 0.5em) 0 1.1em; }
 .leaf-tab:hover .ribbon { filter: brightness(1.07); }
 
 /* панель закладок */
