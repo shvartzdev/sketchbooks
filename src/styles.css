@@ -1019,15 +1019,20 @@ input[type='text'], input[type='number'], .field input {
 .leaf-tab-front { transform: translateZ(0.4px); }
 .leaf-tab-back { transform: rotateY(180deg) translateZ(0.4px); }
 
-/* сама ленточка: атласный отлив и раздвоенный кончик на внешнем конце */
+/*
+ * Сама ленточка — матовая тканая, как ляссе: ровный цвет, еле заметное
+ * плетение вдоль и чуть темнее кромки. Без блика посередине — с ним она
+ * выглядит атласной лентой через плечо, а не закладкой.
+ */
 .ribbon {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(255, 255, 255, 0.22) 45%,
-      rgba(255, 255, 255, 0.05) 60%, rgba(0, 0, 0, 0.2) 100%),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.045) 0 1px, rgba(255, 255, 255, 0.035) 1px 2px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0, rgba(0, 0, 0, 0) 1.5px,
+      rgba(0, 0, 0, 0) calc(100% - 1.5px), rgba(0, 0, 0, 0.14) 100%),
     var(--tab);
   overflow: hidden;
 }
@@ -1048,7 +1053,7 @@ input[type='text'], input[type='number'], .field input {
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
-  color: rgba(24, 20, 14, 0.85);
+  color: rgba(24, 20, 14, 0.8);
 }
 .leaf-tab-back .ribbon > span { padding: 0 calc(6px + 0.5em) 0 1.1em; }
 .leaf-tab:hover .ribbon { filter: brightness(1.07); }
