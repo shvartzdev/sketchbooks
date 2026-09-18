@@ -1,0 +1,9 @@
+// Витрина на Cloudflare: собранный сайт из dist отдаётся как статические файлы.
+// Имя должно совпадать с именем проекта в панели Cloudflare.
+{
+  "name": "sketchbooks",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
