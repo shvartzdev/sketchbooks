@@ -43,6 +43,24 @@ const peekScale = (n) => 1 - Math.min(PEEK_MAX, n) * 0.006
 // Насколько лист выступает из-под разворота: справа считаем от первого
 // нераскрытого, слева — от того, что лежит под левой страницей.
 const peekOf = (d) => (d > 0 ? Math.min(PEEK_MAX, d) : Math.max(0, Math.min(PEEK_MAX, -d - 1)))
+/*
+ * Глубина ленточки. Веер сбоку рисует только пять верхних листов, остальные
+ * сложены за пятым, — и без поправки все глубокие закладки выходили бы из
+ * одной точки. Поэтому для ленточек веер продолжается: чем глубже страница,
+ * тем дальше выходит её ленточка, тем больше краёв страниц лежит на её
+ * основании и тем глубже она в тени. Лента открытой страницы лежит сверху.
+ */
+const ribbonDepth = (d) => {
+  const depth = d >= 0 ? d : Math.max(0, -d - 1)
+  // прирост плавно затухает: разница между 10-м и 20-м листом видна,
+  // между 100-м и 110-м — меньше, но глубины никогда не сливаются
+  const extra = depth > PEEK_MAX ? 22 * (1 - Math.exp(-(depth - PEEK_MAX) / 18)) : 0
+  return {
+    '--extra': extra.toFixed(1),
+    '--cover': `${(depth >= 0.5 ? 6 + extra : 0).toFixed(1)}px`,
+    '--shade': Math.min(0.3, depth * 0.02).toFixed(3),
+  }
+}
 const REFERENCE_MM = { w: 210, h: 297 } // A4 — эталон масштаба на сцене
 const COVER_SLOTS = 2
 
@@ -124,6 +142,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
         ` translateX(${shift}px) scale(${scale})`,
       zIndex: turn > 0.001 && turn < 0.999 ? 900 : 10,
       '--turn': Math.sin(turn * Math.PI).toFixed(3),
+      ...ribbonDepth(d),
     }
   }
 
@@ -140,6 +159,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
         ` translateX(${peekShift(peek).toFixed(1)}px) scale(${peekScale(peek).toFixed(4)})`
       el.style.zIndex = turn > 0.001 && turn < 0.999 ? '900' : '10'
       el.style.setProperty('--turn', Math.sin(turn * Math.PI).toFixed(3))
+      for (const [name, value] of Object.entries(ribbonDepth(d))) el.style.setProperty(name, value)
     })
     // Половинки бумажного блока — это подложка под стопку листов, и нужны они
     // только там, где стопка есть. Слева она появляется, когда первый лист уже
@@ -787,7 +807,7 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
       {
         top: ribbonTop + k * ribbonStep,
         height: ribbonH,
-        width: Math.min(room, Math.round(labelLength(m.title, ribbonFont) + 26)) + 6,
+        '--w': `${Math.min(room, Math.round(labelLength(m.title, ribbonFont) + 26)) + 6}px`,
       },
     ]),
   )
