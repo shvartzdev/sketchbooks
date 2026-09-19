@@ -8,7 +8,7 @@
   "shelf": 0,
   "order": 2,
   "createdAt": 1788619207390,
-  "updatedAt": 1788628671890,
+  "updatedAt": 1789738140522,
   "pages": [
     {
       "id": "az8b9qthmtohp305",
@@ -2673,6 +2673,50 @@
     {
       "id": "e86mhyuamtokmxer",
       "items": []
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": "8gfr993kmu6ztc74",
+      "title": "Ботаника",
+      "color": "#e8b84a",
+      "page": 2
+    },
+    {
+      "id": "6cq636onmu6ztlet",
+      "title": "Санкт-Петербург",
+      "color": "#6f9ec8",
+      "page": 20
+    },
+    {
+      "id": "6n6jn6nimu6zuanq",
+      "title": "Зоологический музей",
+      "color": "#86b59c",
+      "page": 50
+    },
+    {
+      "id": "rl2s6ansmu6zuqhn",
+      "title": "Океанариум",
+      "color": "#6f9ec8",
+      "page": 78
+    },
+    {
+      "id": "ggxljqppmu6zuzhl",
+      "title": "Музей Арктики",
+      "color": "#b99ad6",
+      "page": 84
+    },
+    {
+      "id": "0p65fcm5mu6zv98j",
+      "title": "Эрмитаж",
+      "color": "#6f9ec8",
+      "page": 88
+    },
+    {
+      "id": "qbx5wqfgmu6zvlni",
+      "title": "Музей аномалий тела",
+      "color": "#e07a5f",
+      "page": 106
     }
   ]
 }

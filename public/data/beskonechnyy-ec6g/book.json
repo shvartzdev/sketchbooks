@@ -8,7 +8,7 @@
   "shelf": 0,
   "order": 0,
   "createdAt": 1788622580640,
-  "updatedAt": 1788628961542,
+  "updatedAt": 1789737991455,
   "pages": [
     {
       "id": "6a70xth4mtojpfey",
@@ -601,5 +601,6 @@
       "id": "6aasq7tfmtoni3ge",
       "items": []
     }
-  ]
+  ],
+  "bookmarks": []
 }

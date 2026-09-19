@@ -51,6 +51,21 @@ export async function syncBook(bookId) {
   return exportBook(bookId, handle)
 }
 
+// Убрать папку книжки с диска. Без этого удалённый скетчбук при следующем
+// запуске снова подхватывается из папки и возвращается на полку.
+export async function removeBookFolder(slug) {
+  const handle = await getFolder()
+  if (!handle || !slug) return
+  if ((await folderState(handle)) !== 'granted' && (await askPermission(handle)) !== 'granted') {
+    throw new Error('нет доступа к папке — удалите её вручную: ' + slug)
+  }
+  try {
+    await handle.removeEntry(slug, { recursive: true })
+  } catch (err) {
+    if (err.name !== 'NotFoundError') throw err // папки и не было — всё хорошо
+  }
+}
+
 /*
  * Картинки рядом со скетчбуками: работы в подпапке art, вырезанные предметы
  * в подпапке objects. Так всё едет в git вместе и не требует лазить в исходники.

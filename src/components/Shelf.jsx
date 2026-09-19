@@ -16,13 +16,14 @@ import {
   folderState,
   getFolder,
   linkFolder,
+  removeBookFolder,
   supported,
   syncBook,
   unlinkFolder,
 } from '../lib/folder.js'
 import { EMPTY_ART, Painting, arrangeArt } from './Decor.jsx'
 import BookSettings from './BookSettings.jsx'
-import { yearLines } from '../lib/years.js'
+import { shortYears, yearLines } from '../lib/years.js'
 import { blobUrl } from '../lib/images.js'
 import NewBookDialog from './NewBookDialog.jsx'
 import { Confirm } from './Dialog.jsx'
@@ -69,8 +70,8 @@ const spineWidthAt = (pages, pxPerMm) =>
  * самый крупный шрифт, при котором это выходит. Меряем настоящими буквами,
  * а не на глаз, — на низких корешках счёт идёт на пиксели.
  *
- * Если название не влезает даже мелко, с корешка уходит год: название
- * важнее, а год остаётся во всплывающей подсказке.
+ * Год стоит внизу поперёк корешка, а на узких и низких корешках, где так
+ * не помещается, — вдоль, мелкой строкой под названием.
  */
 let measureCtx = null
 function textWidth(text, size, weight = 600) {
@@ -87,8 +88,8 @@ const MIN_TITLE = 7
 
 function fitTitle(title, w, h, year) {
   const words = (title || '').split(/\s+/).filter(Boolean)
-  const across = w - 6 // толщина под строки
-  const tryFit = (yearH) => {
+  const tryFit = (yearH, yearW = 0) => {
+    const across = w - 6 - yearW // толщина под строки
     const along = h - 20 - yearH - 4 // длина под текст: корешок без полей и года
     for (let f = titleSize(w); f >= MIN_TITLE; f -= 0.5) {
       if (words.some((word) => textWidth(word, f) > along)) continue
@@ -108,16 +109,30 @@ function fitTitle(title, w, h, year) {
   }
   // Год — строки по 12 px плюс черта над ними. Строка переносится ещё раз,
   // если не влезает в свою колонку (62% толщины), а если цифры не помещаются
-  // и так — год на этом корешке не показываем.
+  // и так — год ложится вдоль корешка.
   const parts = yearLines(year)
   const yearWidth = (part) => textWidth(part, 10, 400)
   const yearFits = parts.every((part) => yearWidth(part.replace('–', '')) <= w - 2)
   const lines = parts.reduce((n, part) => n + (yearWidth(part) > w - 2 ? 2 : 1), 0)
-  const withYear = !parts.length ? tryFit(0) : yearFits ? tryFit(lines * 12 + 6) : null
-  if (withYear) return { size: withYear, showYear: true }
-  const without = tryFit(0)
-  return { size: without ?? MIN_TITLE, showYear: false }
+  if (!parts.length) return { size: tryFit(0) ?? MIN_TITLE, year: null }
+  // Способы поставить год, от привычного к тесному: поперёк внизу; вдоль,
+  // строкой под названием; вдоль рядом с названием — для низких толстых
+  // корешков; и то же с коротким диапазоном («2018–20»). Берём первый, при
+  // котором влезает название. Не влезает никак — год остаётся в подсказке.
+  const options = [yearFits && { year: 'across', len: lines * 12 + 6, text: String(year) }]
+  for (const text of new Set([String(year), shortYears(year)])) {
+    const len = textWidth(text, YEAR_ALONG, 400)
+    options.push({ year: 'along', len: len + 4, text })
+    if (len <= h - 20) options.push({ year: 'beside', len: 0, thick: YEAR_ALONG + 5, text })
+  }
+  for (const o of options.filter(Boolean)) {
+    const size = tryFit(o.len, o.thick)
+    if (size) return { size, year: o.year, text: o.text }
+  }
+  return { size: tryFit(0) ?? MIN_TITLE, year: null }
 }
+
+const YEAR_ALONG = 9 // размер года, идущего вдоль корешка
 
 const TOP_LEDGE = 0.52 // доля высоты стены, на которой висит верхняя полка
 const LEDGE_GAP = 10 // промежуток между вещами на полке, из CSS
@@ -597,6 +612,11 @@ export default function Shelf({ onOpen }) {
 
   const remove = async (book) => {
     setConfirm(null)
+    try {
+      await removeBookFolder(book.slug)
+    } catch (err) {
+      setNotice(`Не получилось удалить папку: ${err.message}`)
+    }
     await deleteBook(book.id)
     load()
   }
@@ -743,7 +763,7 @@ export default function Shelf({ onOpen }) {
                       onPointerCancel={endDrag}
                     >
                       <button
-                        className="spine"
+                        className={'spine' + (fit.year === 'beside' ? ' spine-beside' : '')}
                         style={{ height: h, width: w, background: book.coverColor }}
                         onClick={(e) => {
                           if (Date.now() - draggedAt.current < 250) return
@@ -757,7 +777,10 @@ export default function Shelf({ onOpen }) {
                         <span className="spine-title" style={{ fontSize: fit.size }}>
                           {book.title}
                         </span>
-                        {book.year && fit.showYear && (
+                        {(fit.year === 'along' || fit.year === 'beside') && (
+                          <span className="spine-year spine-year-along">{fit.text}</span>
+                        )}
+                        {fit.year === 'across' && (
                           <span className="spine-year">
                             {yearLines(book.year).map((line) => (
                               <span key={line}>{line}</span>

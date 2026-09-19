@@ -8,7 +8,7 @@
   "shelf": 0,
   "order": 1,
   "createdAt": 1788614050906,
-  "updatedAt": 1788628441428,
+  "updatedAt": 1789738017709,
   "pages": [
     {
       "id": "3wvdbhocmtoemo7y",
@@ -504,6 +504,20 @@
     {
       "id": "kaa5vpgcmtoemo7y",
       "items": []
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": "hytz4zssmu6zsn78",
+      "title": "Калининград",
+      "color": "#86b59c",
+      "page": 14
+    },
+    {
+      "id": "0by9h2mimu6zszh0",
+      "title": "Скетчи",
+      "color": "#e07a5f",
+      "page": 0
     }
   ]
 }

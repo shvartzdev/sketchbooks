@@ -17,3 +17,9 @@ export function yearLines(year) {
   const parts = String(year).split('–')
   return parts.length === 2 ? [parts[0], `–${parts[1]}`] : [String(year)]
 }
+
+// Короткий диапазон для тесного корешка: «2018–2020» → «2018–20».
+export function shortYears(year) {
+  const m = String(year || '').match(/^(\d{2})(\d{2})–(\d{2})(\d{2})$/)
+  return m && m[1] === m[3] ? `${m[1]}${m[2]}–${m[4]}` : String(year)
+}

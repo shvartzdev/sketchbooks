@@ -227,6 +227,34 @@ h2 { font-size: 17px; margin: 0 0 4px; font-weight: 600; }
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
+/* Год вдоль корешка: строка по центру под названием, черта над ней
+   короткая и поперёк, как у года внизу. */
+.spine-year-along {
+  display: block;
+  writing-mode: vertical-rl;
+  width: auto;
+  font-size: 9px;
+  line-height: 1;
+  white-space: nowrap;
+  background: none;
+  padding-top: 0;
+  position: relative;
+  margin-top: 4px;
+}
+/* Низкий толстый корешок: название и год стоят рядом, каждый во всю длину */
+.spine-beside { flex-direction: row-reverse; justify-content: center; gap: 5px; }
+.spine-beside .spine-year-along { margin-top: 0; }
+.spine-beside .spine-year-along::before { display: none; }
+.spine-year-along::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 10px;
+  margin-left: -5px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
 
 .spine-tool {
   position: absolute;
