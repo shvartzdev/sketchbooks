@@ -8,7 +8,7 @@
   "shelf": 0,
   "order": 1,
   "createdAt": 1788614050906,
-  "updatedAt": 1789819576483,
+  "updatedAt": 1790010209558,
   "pages": [
     {
       "id": "3wvdbhocmtoemo7y",
@@ -754,13 +754,13 @@
       "id": "330g8j63mu8cd3tu",
       "items": [
         {
-          "id": "0v1cg592mubbc8ln",
-          "file": "images/0v1cg592mubbc8ln.jpg",
-          "thumb": "thumbs/0v1cg592mubbc8ln.jpg",
-          "x": -0.24506,
-          "y": -0.19261,
-          "w": 1.45667,
-          "h": 1.36881,
+          "id": "77hh0zgfmubhszja",
+          "file": "images/77hh0zgfmubhszja.jpg",
+          "thumb": "thumbs/77hh0zgfmubhszja.jpg",
+          "x": -0.00278,
+          "y": -0.03729,
+          "w": 1.01085,
+          "h": 1.04278,
           "rot": 0,
           "crop": {
             "x": 0,
@@ -768,8 +768,8 @@
             "w": 1,
             "h": 1
           },
-          "iw": 1800,
-          "ih": 2400
+          "iw": 910,
+          "ih": 1332
         }
       ]
     },
@@ -777,13 +777,13 @@
       "id": "8onmez3amu8cd3tu",
       "items": [
         {
-          "id": "0os38toimubbcpfx",
-          "file": "images/0os38toimubbcpfx.jpg",
-          "thumb": "thumbs/0os38toimubbcpfx.jpg",
-          "x": -0.21117,
-          "y": -0.06405,
-          "w": 1.31149,
-          "h": 1.23238,
+          "id": "fpshfcodmubht86u",
+          "file": "images/fpshfcodmubht86u.jpg",
+          "thumb": "thumbs/fpshfcodmubht86u.jpg",
+          "x": -0.00947,
+          "y": -0.00755,
+          "w": 1.04478,
+          "h": 1.00932,
           "rot": 0,
           "crop": {
             "x": 0,
@@ -791,8 +791,8 @@
             "w": 1,
             "h": 1
           },
-          "iw": 1800,
-          "ih": 2400
+          "iw": 944,
+          "ih": 1294
         }
       ]
     },
@@ -800,13 +800,13 @@
       "id": "sxlulfr0mu8cd3tu",
       "items": [
         {
-          "id": "lt571cnimubbd19u",
-          "file": "images/lt571cnimubbd19u.jpg",
-          "thumb": "thumbs/lt571cnimubbd19u.jpg",
-          "x": -0.26184,
-          "y": -0.24411,
-          "w": 1.65209,
-          "h": 1.55244,
+          "id": "tzpib1ommubhtff3",
+          "file": "images/tzpib1ommubhtff3.jpg",
+          "thumb": "thumbs/tzpib1ommubhtff3.jpg",
+          "x": -0.03265,
+          "y": -0.00992,
+          "w": 1.05258,
+          "h": 1.01057,
           "rot": 0,
           "crop": {
             "x": 0,
@@ -814,8 +814,8 @@
             "w": 1,
             "h": 1
           },
-          "iw": 1800,
-          "ih": 2400
+          "iw": 944,
+          "ih": 1286
         }
       ]
     },
@@ -823,13 +823,13 @@
       "id": "juj5985xmu8cd3tu",
       "items": [
         {
-          "id": "a186ylocmubbddcm",
-          "file": "images/a186ylocmubbddcm.jpg",
-          "thumb": "thumbs/a186ylocmubbddcm.jpg",
-          "x": -0.1139,
-          "y": -0.08068,
-          "w": 1.30076,
-          "h": 1.2223,
+          "id": "jtzkd2x1mubhtm5n",
+          "file": "images/jtzkd2x1mubhtm5n.jpg",
+          "thumb": "thumbs/jtzkd2x1mubhtm5n.jpg",
+          "x": -0.00193,
+          "y": -0.00793,
+          "w": 1.06386,
+          "h": 1.02618,
           "rot": 0,
           "crop": {
             "x": 0,
@@ -837,18 +837,56 @@
             "w": 1,
             "h": 1
           },
-          "iw": 1800,
-          "ih": 2400
+          "iw": 906,
+          "ih": 1240
         }
       ]
     },
     {
       "id": "hsopmnk9mu8cd3tu",
-      "items": []
+      "items": [
+        {
+          "id": "juezdxqhmubhtts9",
+          "file": "images/juezdxqhmubhtts9.jpg",
+          "thumb": "thumbs/juezdxqhmubhtts9.jpg",
+          "x": -0.00551,
+          "y": -0.00568,
+          "w": 1.01943,
+          "h": 1.00522,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 932,
+          "ih": 1304
+        }
+      ]
     },
     {
       "id": "x4os4dk6mu8cd3tu",
-      "items": []
+      "items": [
+        {
+          "id": "jakbf7j7mubhtyr0",
+          "file": "images/jakbf7j7mubhtyr0.jpg",
+          "thumb": "thumbs/jakbf7j7mubhtyr0.jpg",
+          "x": -0.00718,
+          "y": -0.00837,
+          "w": 1.08975,
+          "h": 1.0151,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 976,
+          "ih": 1290
+        }
+      ]
     },
     {
       "id": "2s6agug0mu8cd3tu",
@@ -899,6 +937,24 @@
       "title": "Скетчи",
       "color": "#e07a5f",
       "page": 0
+    },
+    {
+      "id": "jfm9nrhomubhucp6",
+      "title": "Львицы",
+      "color": "#86b59c",
+      "page": 36
+    },
+    {
+      "id": "ali3sc1imubhus1h",
+      "title": "Пионерский",
+      "color": "#6f9ec8",
+      "page": 22
+    },
+    {
+      "id": "skf2ishwmubhuzrl",
+      "title": "Светлогорск",
+      "color": "#b99ad6",
+      "page": 34
     }
   ]
 }
