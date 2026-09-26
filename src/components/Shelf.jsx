@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
+  clearMeta,
   createBook,
   deleteBook,
   listBooks,
@@ -304,11 +305,6 @@ export default function Shelf({ onOpen }) {
     setFolder(handle ? { name: handle.name, state: await folderState(handle) } : null)
   }, [])
 
-  useEffect(() => {
-    load()
-    refreshFolder().then(loadArt)
-  }, [load, refreshFolder, loadArt])
-
   // При привязке папки сразу выкладываем в неё всё, что уже есть на полке:
   // иначе книжка попадёт на диск только когда её откроют, а это не очевидно.
   const pushAllToFolder = useCallback(async (handle) => {
@@ -330,9 +326,20 @@ export default function Shelf({ onOpen }) {
   // Из папки в браузер — не кнопка, а следствие привязки: если в папке есть
   // скетчбуки, которых тут нет (после git clone на другой машине), они просто
   // появляются на полке.
+  const pickingUp = useRef(false)
   const pickUpFromFolder = useCallback(async (handle) => {
+    // Два чтения папки разом (клик по «разрешить запись» и проверка при
+    // загрузке) успевали оба не найти книжку и обе её завести — отсюда
+    // дубли на полке. Пускаем по одному.
+    if (pickingUp.current) return
+    pickingUp.current = true
     try {
-      const known = (await listBooks()).map((b) => b.slug).filter(Boolean)
+      // «Известные» — это и то, что уже на полке, и то, что с полки убрали:
+      // удалённое не должно возвращаться из папки само.
+      const known = [
+        ...(await listBooks()).map((b) => b.slug).filter(Boolean),
+        ...((await getMeta('forgotten')) || []),
+      ]
       setBusy({ done: 0, total: 1 })
       const added = await importMissing(handle, known, (done, total) => setBusy({ done, total }))
       setBusy(null)
@@ -343,8 +350,23 @@ export default function Shelf({ onOpen }) {
     } catch (err) {
       setBusy(null)
       setNotice(`Не получилось прочитать папку: ${err.message}`)
+    } finally {
+      pickingUp.current = false
     }
   }, [load])
+
+  useEffect(() => {
+    load()
+    refreshFolder().then(async () => {
+      await loadArt()
+      // Папку перечитываем при каждом открытии полки: книжка, появившаяся
+      // в ней со стороны (склонировали репозиторий, собрали альбом),
+      // должна встать на полку сама, без привязывания папки заново.
+      const handle = await getFolder()
+      if (handle && (await folderState(handle)) === 'granted') await pickUpFromFolder(handle)
+    })
+  }, [load, refreshFolder, loadArt, pickUpFromFolder])
+
 
   const chooseFolder = async () => {
     if (!supported()) {
@@ -353,6 +375,7 @@ export default function Shelf({ onOpen }) {
     }
     try {
       const handle = await linkFolder()
+      await clearMeta('forgotten') // новая папка — новый отсчёт
       await refreshFolder()
       await pushAllToFolder(handle)
       await pickUpFromFolder(handle)
