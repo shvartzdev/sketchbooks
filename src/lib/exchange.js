@@ -118,6 +118,25 @@ export async function exportBook(bookId, dirHandle, onProgress) {
   for (const page of pages) {
     const items = []
     for (const it of itemsOf(page)) {
+      // Подпись — это текст, а не файл: она целиком живёт в book.json.
+      if (it.kind === 'text') {
+        items.push({
+          id: it.id,
+          kind: 'text',
+          text: it.text ?? '',
+          x: round(it.x),
+          y: round(it.y),
+          w: round(it.w),
+          h: round(it.h),
+          rot: round(it.rot || 0, 1),
+          size: round(it.size ?? 0.05, 4),
+          align: it.align || 'center',
+          color: it.color || '#2a241c',
+          font: it.font || 'serif',
+          weight: it.weight || 400,
+        })
+        continue
+      }
       const file = `${it.id}.jpg`
       if (it.blob && !(await fileExists(imagesDir, file))) {
         await writeFile(imagesDir, file, it.blob)
@@ -158,7 +177,9 @@ export async function exportBook(bookId, dirHandle, onProgress) {
   )
 
   // подчищаем картинки удалённых страниц, чтобы репозиторий не пух
-  const used = new Set(manifest.pages.flatMap((p) => p.items.map((i) => `${i.id}.jpg`)))
+  const used = new Set(
+    manifest.pages.flatMap((p) => p.items.filter((i) => i.kind !== 'text').map((i) => `${i.id}.jpg`)),
+  )
   let removed = 0
   for (const dir of [imagesDir, thumbsDir]) {
     for await (const entry of dir.values()) {
@@ -218,6 +239,10 @@ async function importOne(bookDir, onProgress) {
   for (const page of manifest.pages) {
     const items = []
     for (const entry of page.items || []) {
+      if (entry.kind === 'text') {
+        items.push({ ...entry })
+        continue
+      }
       const name = entry.file.split('/').pop()
       const blob = await (await imagesDir.getFileHandle(name)).getFile()
       const { thumb, w, h } = await makeThumb(blob)

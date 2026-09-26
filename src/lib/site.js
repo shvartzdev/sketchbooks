@@ -73,6 +73,7 @@ export function siteBook(slug) {
       blob: null,
       thumb: null,
       items: (page.items || []).map((it) => {
+        if (it.kind === 'text') return { ...it } // подпись — просто текст, файла нет
         const origin = dataUrl(`${slug}/${it.file}`)
         return {
           ...it,

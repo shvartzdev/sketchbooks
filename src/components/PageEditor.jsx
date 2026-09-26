@@ -3,6 +3,8 @@ import { blobUrl } from '../lib/images.js'
 import { clampCrop, fitCrop, getCrop, imageAspect, zoomCrop } from '../lib/crop.js'
 import { angleTo, normalizeAngle, toLocalDelta, toPageDelta } from '../lib/geometry.js'
 import ItemView from './ItemView.jsx'
+import { TextBlock } from './PageContent.jsx'
+import { uid } from '../lib/db.js'
 
 /*
  * Крупный просмотр страницы, он же сборка коллажа.
@@ -17,6 +19,12 @@ import ItemView from './ItemView.jsx'
 
 const MIN_SIZE = 0.05
 const CORNERS = ['nw', 'ne', 'sw', 'se']
+
+// Подпись: размер шрифта — доля высоты страницы, поэтому она одинаково
+// смотрится и в развороте, и в ленте миниатюр, и в PDF.
+const TEXT_SIZES = { min: 0.02, max: 0.22, step: 0.005 }
+const INKS = ['#2a241c', '#000000', '#7b4b3a', '#8a7a52', '#f4f1ea']
+const isText = (it) => it?.kind === 'text'
 
 export default function PageEditor({
   page,
@@ -34,6 +42,8 @@ export default function PageEditor({
   const [items, setItems] = useState(page.items || [])
   const [selected, setSelected] = useState(null)
   const [cropping, setCropping] = useState(null) // id картинки в режиме кадрирования
+  const [editing, setEditing] = useState(null) // id подписи, которую сейчас набирают
+  const [pageBox, setPageBox] = useState({ w: 0, h: 0 }) // размер страницы на экране
   const pageRef = useRef(null)
   const gesture = useRef(null)
   const itemsRef = useRef(items)
@@ -55,6 +65,20 @@ export default function PageEditor({
     setSelected(next.length ? next[next.length - 1].id : null)
     setCropping(null)
   }, [page.id, page.items])
+
+  // Кегль подписи задан долей высоты страницы, поэтому нужен её размер на экране.
+  useEffect(() => {
+    const el = pageRef.current
+    if (!el) return
+    const measure = () => {
+      const r = el.getBoundingClientRect()
+      setPageBox({ w: r.width, h: r.height })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const aspectOf = useCallback((item) => imageAspect(item, natural.current.get(item.id) || 1), [])
 
@@ -117,7 +141,8 @@ export default function PageEditor({
       start: { ...item },
       startCrop: getCrop(item),
       ratio: item.w / item.h,
-      free: cropping === id, // в кадрировании рамка меняет форму свободно
+      // подпись и кадрирование тянутся свободно, картинка — с сохранением пропорций
+      free: cropping === id || isText(item),
       moved: false,
     }
     try {
@@ -201,10 +226,7 @@ export default function PageEditor({
     const cx = s.x + s.w / 2 + grow.dx
     const cy = s.y + s.h / 2 + grow.dy
     const frame = { ...s, w, h, x: cx - w / 2, y: cy - h / 2 }
-    patchItem(g.id, {
-      ...frame,
-      crop: clampCrop(g.startCrop, frame, aspect, imgAspect),
-    })
+    patchItem(g.id, isText(s) ? frame : { ...frame, crop: clampCrop(g.startCrop, frame, aspect, imgAspect) })
   }
 
   const endGesture = () => {
@@ -241,6 +263,40 @@ export default function PageEditor({
     )
   }
 
+  const patchSelected = (patch) => {
+    if (!selected) return
+    commit(itemsRef.current.map((i) => (i.id === selected ? { ...i, ...patch } : i)))
+  }
+
+  const addText = () => {
+    const it = {
+      id: uid(),
+      kind: 'text',
+      text: 'Текст',
+      x: 0.12,
+      y: 0.44,
+      w: 0.76,
+      h: 0.12,
+      rot: 0,
+      size: 0.05,
+      align: 'center',
+      color: INKS[0],
+      font: 'serif',
+      weight: 400,
+    }
+    commit([...itemsRef.current, it])
+    setSelected(it.id)
+    setCropping(null)
+    setEditing(it.id)
+  }
+
+  const resizeText = (dir) => {
+    const it = itemsRef.current.find((i) => i.id === selected)
+    if (!isText(it)) return
+    const size = Math.min(TEXT_SIZES.max, Math.max(TEXT_SIZES.min, (it.size ?? 0.05) + dir * TEXT_SIZES.step))
+    patchSelected({ size: Math.round(size * 1000) / 1000 })
+  }
+
   const removeSelected = useCallback(() => {
     if (!selected) return
     commit(itemsRef.current.filter((i) => i.id !== selected))
@@ -267,7 +323,8 @@ export default function PageEditor({
     const onKey = (e) => {
       if (e.target.matches?.('input, textarea')) return
       if (e.key === 'Escape') {
-        if (cropping) setCropping(null)
+        if (editing) setEditing(null)
+        else if (cropping) setCropping(null)
         else onClose()
       } else if (e.key === 'Backspace' || e.key === 'Delete') removeSelected()
       else if (e.key === 'ArrowRight' && !cropping) onMove(1)
@@ -275,7 +332,7 @@ export default function PageEditor({
     }
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
-  }, [cropping, onClose, onMove, removeSelected])
+  }, [cropping, editing, onClose, onMove, removeSelected])
 
   // колесо масштабирует кадр — только когда кадрируем, иначе это просто скролл
   const onWheel = (e) => {
@@ -320,20 +377,50 @@ export default function PageEditor({
                 transform: it.rot ? `rotate(${it.rot}deg)` : undefined,
               }}
               onPointerDown={(e) => onPointerDown(e, it.id, null)}
-              onDoubleClick={() => setCropping(cropping === it.id ? null : it.id)}
+              onDoubleClick={() =>
+                isText(it)
+                  ? setEditing(it.id)
+                  : setCropping(cropping === it.id ? null : it.id)
+              }
             >
               {/* обрезка живёт во внутреннем слое: иначе overflow рамки
                   срезал бы ручки, которые торчат наружу */}
               <div className="edit-clip">
-                <ItemView
-                  item={it}
-                  onLoad={(e) => {
-                    const img = e.currentTarget
-                    if (img.naturalWidth) {
-                      natural.current.set(it.id, img.naturalWidth / img.naturalHeight)
-                    }
-                  }}
-                />
+                {isText(it) ? (
+                  editing === it.id ? (
+                    <textarea
+                      className={'edit-text page-text-' + (it.font || 'serif')}
+                      value={it.text}
+                      autoFocus
+                      style={{
+                        fontSize: `${(it.size ?? 0.05) * pageBox.h}px`,
+                        textAlign: it.align || 'center',
+                        color: it.color,
+                        fontWeight: it.weight || 400,
+                      }}
+                      onChange={(e) => patchItem(it.id, { text: e.target.value })}
+                      onBlur={() => {
+                        setEditing(null)
+                        save(itemsRef.current)
+                      }}
+                      onKeyDown={(e) => e.key === 'Escape' && e.currentTarget.blur()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <TextBlock item={it} fontSize={(it.size ?? 0.05) * pageBox.h} />
+                  )
+                ) : (
+                  <ItemView
+                    item={it}
+                    onLoad={(e) => {
+                      const img = e.currentTarget
+                      if (img.naturalWidth) {
+                        natural.current.set(it.id, img.naturalWidth / img.naturalHeight)
+                      }
+                    }}
+                  />
+                )}
               </div>
               {selected === it.id && (
                 <>
@@ -356,7 +443,8 @@ export default function PageEditor({
 
           {items.length === 0 && !page.blob && (
             <p className="editor-hint muted">
-              Пустая страница. Добавьте изображение — его можно двигать, тянуть за углы и кадрировать.
+              Пустая страница. Добавьте изображение или подпись — их можно двигать, тянуть за
+              углы и поворачивать.
             </p>
           )}
 
@@ -409,9 +497,79 @@ export default function PageEditor({
                 }}
               />
             </label>
-            <button className="btn" onClick={() => setCropping(selected)} disabled={!item}>
-              Кадрировать
+            <button className="btn" onClick={addText}>
+              Текст
             </button>
+
+            <span className="editor-sep" />
+
+            {isText(item) ? (
+              <>
+                <button className="btn" onClick={() => resizeText(-1)} title="Мельче">
+                  А−
+                </button>
+                <button className="btn" onClick={() => resizeText(1)} title="Крупнее">
+                  А+
+                </button>
+                <button
+                  className={'btn' + (item.font !== 'sans' ? ' btn-on' : '')}
+                  onClick={() => patchSelected({ font: item.font === 'sans' ? 'serif' : 'sans' })}
+                  title="Шрифт: с засечками или без"
+                >
+                  {item.font === 'sans' ? 'Гротеск' : 'Антиква'}
+                </button>
+                <button
+                  className={'btn' + ((item.weight || 400) >= 600 ? ' btn-on' : '')}
+                  onClick={() => patchSelected({ weight: (item.weight || 400) >= 600 ? 400 : 600 })}
+                  title="Полужирный"
+                >
+                  <b>Ж</b>
+                </button>
+                {[
+                  ['left', '⟵', 'По левому краю'],
+                  ['center', '⟷', 'По центру'],
+                  ['right', '⟶', 'По правому краю'],
+                ].map(([value, sign, hint]) => (
+                  <button
+                    key={value}
+                    className={'btn' + ((item.align || 'center') === value ? ' btn-on' : '')}
+                    onClick={() => patchSelected({ align: value })}
+                    title={hint}
+                  >
+                    {sign}
+                  </button>
+                ))}
+                <span className="ink-row">
+                  {INKS.map((c) => (
+                    <button
+                      key={c}
+                      className={'ink' + (item.color === c ? ' ink-on' : '')}
+                      style={{ background: c }}
+                      onClick={() => patchSelected({ color: c })}
+                      title="Цвет подписи"
+                    />
+                  ))}
+                </span>
+                <button
+                  className="btn"
+                  onClick={() => patchSelected({ x: (1 - item.w) / 2 })}
+                  title="Поставить блок по центру страницы по горизонтали"
+                >
+                  ↔ по центру
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => patchSelected({ y: (1 - item.h) / 2 })}
+                  title="Поставить блок по центру страницы по вертикали"
+                >
+                  ↕ по центру
+                </button>
+              </>
+            ) : (
+              <button className="btn" onClick={() => setCropping(selected)} disabled={!item}>
+                Кадрировать
+              </button>
+            )}
             <button className="btn" onClick={() => rotateBy(-90)} disabled={!item} title="Повернуть влево">
               ⟲
             </button>

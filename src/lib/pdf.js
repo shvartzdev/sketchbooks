@@ -48,6 +48,10 @@ async function renderPage(page, book, pxPerMm) {
   }
 
   for (const item of page.items || []) {
+    if (item.kind === 'text') {
+      drawText(ctx, item, W, H)
+      continue
+    }
     if (!item.blob) continue
     // в PDF идёт оригинал: на экране хватает уменьшенной копии, а в печать — нет
     const bitmap = await loadBitmap(item.origin || item.blob)
@@ -75,6 +79,45 @@ async function renderPage(page, book, pxPerMm) {
 }
 
 // Книжку можно передать готовой: на витрине она приходит из файлов, а не из базы.
+/*
+ * Подпись на канве: тот же кегль долей от высоты страницы, тот же перенос по
+ * словам и то же выравнивание, что и на экране, — чтобы PDF совпадал с книжкой.
+ */
+function drawText(ctx, item, W, H) {
+  const text = (item.text || '').trim()
+  if (!text) return
+  const fontPx = (item.size ?? 0.05) * H
+  const family = item.font === 'sans' ? 'Helvetica, Arial, sans-serif' : 'Georgia, "Times New Roman", serif'
+  ctx.save()
+  ctx.font = `${(item.weight || 400) >= 600 ? 600 : 400} ${fontPx}px ${family}`
+  ctx.fillStyle = item.color || '#2a241c'
+  ctx.textBaseline = 'middle'
+  const align = item.align || 'center'
+  ctx.textAlign = align === 'left' ? 'left' : align === 'right' ? 'right' : 'center'
+
+  const fw = item.w * W
+  const lines = []
+  for (const para of text.split('\n')) {
+    let line = ''
+    for (const word of para.split(/\s+/)) {
+      const probe = line ? `${line} ${word}` : word
+      if (line && ctx.measureText(probe).width > fw) {
+        lines.push(line)
+        line = word
+      } else line = probe
+    }
+    lines.push(line)
+  }
+
+  ctx.translate((item.x + item.w / 2) * W, (item.y + item.h / 2) * H)
+  if (item.rot) ctx.rotate(rad(item.rot))
+  const lh = fontPx * 1.35
+  const x = align === 'left' ? -fw / 2 : align === 'right' ? fw / 2 : 0
+  const top = -((lines.length - 1) * lh) / 2
+  lines.forEach((line, i) => ctx.fillText(line, x, top + i * lh))
+  ctx.restore()
+}
+
 export async function bookToPdf(bookId, { onProgress, withCover = true, source } = {}) {
   const { jsPDF } = await import('jspdf')
   const [book, pages] = source

@@ -477,7 +477,28 @@ input[type='text'], input[type='number'], .field input {
 
 /* содержимое страницы: подложка, размещённые картинки, номер */
 
-.page-content { position: absolute; inset: 0; overflow: hidden; }
+/* размер шрифта подписей считается от высоты страницы — отсюда container-type */
+.page-content { position: absolute; inset: 0; overflow: hidden; container-type: size; }
+
+/*
+ * Подпись на странице. Блок задаёт место, текст стоит в нём по центру по
+ * вертикали: для одно-двухстрочных подписей это то, что нужно, а длинный
+ * абзац всё равно заполняет блок целиком.
+ */
+.page-text {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.page-text-serif { font-family: 'Iowan Old Style', Georgia, 'Times New Roman', serif; }
+.page-text-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 .page-scan { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .page-item { position: absolute; overflow: hidden; }
 .page-item img { position: absolute; display: block; max-width: none; }
@@ -1134,3 +1155,30 @@ input[type='text'], input[type='number'], .field input {
   cursor: pointer;
 }
 .bookmark-swatch-on { border-color: var(--text); }
+
+/* ---------- подписи в редакторе ---------- */
+
+/* набор текста прямо в блоке: поле прозрачное, чтобы видеть страницу под ним */
+.edit-text {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: rgba(255, 255, 255, 0.35);
+  line-height: 1.35;
+}
+.ink-row { display: inline-flex; gap: 5px; align-items: center; }
+.ink {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.ink-on { border-color: var(--accent); }
