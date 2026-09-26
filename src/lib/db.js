@@ -93,19 +93,20 @@ export async function updateBook(id, patch) {
 }
 
 export async function deleteBook(id) {
-  const book = await getBook(id)
   const pages = await listPages(id)
   await tx('pages', 'readwrite', (s) => {
     pages.forEach((p) => s.delete(p.id))
   })
   await tx('books', 'readwrite', (s) => s.delete(id))
-  // Папка удалённой книжки остаётся на диске, и полка подхватывает из папки
-  // всё незнакомое. Без этой пометки удалённая книжка возвращалась бы при
-  // каждом запуске — так однажды и случилось.
-  if (book?.slug) {
-    const forgotten = (await getMeta('forgotten')) || []
-    if (!forgotten.includes(book.slug)) await setMeta('forgotten', [...forgotten, book.slug])
-  }
+}
+
+// Пометить папку как «не возвращать». Нужно только когда её не удалось стереть
+// с диска: обычно удаление книжки уносит папку с собой, и тогда помечать нечего,
+// иначе заново собранная книжка с тем же именем не смогла бы попасть на полку.
+export async function forgetSlug(slug) {
+  if (!slug) return
+  const forgotten = (await getMeta('forgotten')) || []
+  if (!forgotten.includes(slug)) await setMeta('forgotten', [...forgotten, slug])
 }
 
 /* ---------- страницы ---------- */

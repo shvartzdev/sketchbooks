@@ -3,6 +3,7 @@ import {
   clearMeta,
   createBook,
   deleteBook,
+  forgetSlug,
   listBooks,
   getMeta,
   placeBooks,
@@ -638,6 +639,8 @@ export default function Shelf({ onOpen }) {
     try {
       await removeBookFolder(book.slug)
     } catch (err) {
+      // папка осталась на диске — помечаем, чтобы книжка не вернулась с неё сама
+      await forgetSlug(book.slug)
       setNotice(`Не получилось удалить папку: ${err.message}`)
     }
     await deleteBook(book.id)
