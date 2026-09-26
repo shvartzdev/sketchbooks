@@ -7,3 +7,6 @@ public/data/index.json
 public/data/*/web/
 public/data/*/mini/
 public/data/art/web/
+
+# черновик альбома с чужими обложками: держим только на своей машине
+public/data/dune-albom/
