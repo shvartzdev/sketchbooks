@@ -8,7 +8,7 @@
   "shelf": 0,
   "order": 0,
   "createdAt": 1788622580640,
-  "updatedAt": 1789737991455,
+  "updatedAt": 1790862589307,
   "pages": [
     {
       "id": "6a70xth4mtojpfey",
@@ -357,11 +357,67 @@
     },
     {
       "id": "cp1o1v09mtojpfey",
-      "items": []
+      "items": [
+        {
+          "id": "jzvlm535mupledr1",
+          "file": "images/jzvlm535mupledr1.jpg",
+          "thumb": "thumbs/jzvlm535mupledr1.jpg",
+          "x": -0.00576,
+          "y": -0.005,
+          "w": 1.01627,
+          "h": 0.47999,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 1280,
+          "ih": 855
+        },
+        {
+          "id": "epn8vdcemuplevzn",
+          "file": "images/epn8vdcemuplevzn.jpg",
+          "thumb": "thumbs/epn8vdcemuplevzn.jpg",
+          "x": 0.00365,
+          "y": 0.47494,
+          "w": 0.48509,
+          "h": 0.52266,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 1575,
+          "ih": 2400
+        }
+      ]
     },
     {
       "id": "nf8opkjgmtojpfey",
-      "items": []
+      "items": [
+        {
+          "id": "anliu0j0muplepds",
+          "file": "images/anliu0j0muplepds.jpg",
+          "thumb": "thumbs/anliu0j0muplepds.jpg",
+          "x": -0.00503,
+          "y": -0.0002,
+          "w": 1.02407,
+          "h": 1.02406,
+          "rot": 0,
+          "crop": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1
+          },
+          "iw": 1697,
+          "ih": 2400
+        }
+      ]
     },
     {
       "id": "omvgqdu9mtojpfey",
@@ -789,6 +845,10 @@
     },
     {
       "id": "6aasq7tfmtoni3ge",
+      "items": []
+    },
+    {
+      "id": "ntttzhelmuplcho4",
       "items": []
     }
   ],
