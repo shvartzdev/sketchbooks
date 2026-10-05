@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import Shelf from './components/Shelf.jsx'
 import BookView from './components/BookView.jsx'
+import Wall from './components/Wall.jsx'
 
 function readRoute() {
   const m = window.location.hash.match(/^#\/book\/([\w-]+)/)
-  return m ? { name: 'book', id: m[1] } : { name: 'shelf' }
+  if (m) return { name: 'book', id: m[1] }
+  if (window.location.hash.startsWith('#/wall')) return { name: 'wall' }
+  return { name: 'shelf' }
 }
 
 export default function App() {
@@ -45,6 +48,11 @@ export default function App() {
       {route.name === 'shelf' && (
         <div className={'screen' + (flight ? ' screen-leaving' : '')}>
           <Shelf onOpen={openBook} />
+        </div>
+      )}
+      {route.name === 'wall' && (
+        <div className="screen">
+          <Wall onBack={goShelf} onOpenBook={(id) => (window.location.hash = `#/book/${id}`)} />
         </div>
       )}
       {bookId && (

@@ -669,6 +669,9 @@ export default function Shelf({ onOpen }) {
               Привязать папку
             </button>
           ))}
+        <button className="btn" onClick={() => (window.location.hash = '#/wall')}>
+          Все работы
+        </button>
         {EDITOR && (
           <button className="btn btn-primary" onClick={() => setDialog(true)}>
             Новый скетчбук

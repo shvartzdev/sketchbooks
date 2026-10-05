@@ -1182,3 +1182,59 @@ input[type='text'], input[type='number'], .field input {
   cursor: pointer;
 }
 .ink-on { border-color: var(--accent); }
+
+/* ---------- экран «Все работы» ---------- */
+
+/*
+ * Поле, по которому ездят во все стороны. Сами кадры лежат в одном слое,
+ * который двигается целиком: так браузер перерисовывает одну поверхность,
+ * а не двести картинок по отдельности.
+ */
+.wall-screen { position: fixed; inset: 0; display: flex; flex-direction: column; }
+.wall-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: radial-gradient(120% 90% at 50% 0%, #1b1e24 0%, var(--bg) 70%);
+}
+.wall-stage:active { cursor: grabbing; }
+.wall-field { position: absolute; top: 0; left: 0; will-change: transform; }
+
+.wall-tile {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: #0f1115;
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.wall-tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+/* кадр под курсором чуть выходит вперёд — видно, что он живой */
+.wall-tile:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6); }
+
+.wall-label {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(14, 16, 20, 0.86);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  pointer-events: none;
+}
+.wall-empty { position: absolute; inset: 0; display: grid; place-content: center; }
+.wall-zoom-img {
+  max-width: min(92vw, 1200px);
+  max-height: calc(100% - 70px);
+  border-radius: 3px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+}
