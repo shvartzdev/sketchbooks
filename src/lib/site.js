@@ -34,6 +34,9 @@ export async function siteBooks() {
     shelf: b.shelf ?? null,
     order: b.order ?? null,
     createdAt: b.createdAt ?? 0,
+    // обложка — адресом вместо блоба, как и все картинки витрины
+    cover: b.cover ? dataUrl(b.cover) : null,
+    coverThumb: b.coverThumb ? dataUrl(b.coverThumb) : null,
   }))
   const summaries = Object.fromEntries(
     (index.books || []).map((b) => [
@@ -66,6 +69,9 @@ export function siteBook(slug) {
       heightMm: manifest.heightMm,
       coverColor: manifest.coverColor,
       year: manifest.year ?? null,
+      cover: manifest.cover
+        ? dataUrl(sizes?.web ? `${slug}/${sizes.web}/${stem(manifest.cover)}.webp` : `${slug}/${manifest.cover}`)
+        : null,
     }
     const pages = (manifest.pages || []).map((page, i) => ({
       id: page.id || `${slug}-${i}`,

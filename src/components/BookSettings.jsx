@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { bookHasImages } from '../lib/db.js'
+import { bookHasImages, uid } from '../lib/db.js'
 import FormatPicker from './FormatPicker.jsx'
+import BookCover from './BookCover.jsx'
 import { normalizeYears } from '../lib/years.js'
+import { prepareScan } from '../lib/images.js'
 
 /*
- * Правка готового скетчбука: название меняется всегда, формат — пока в книжке
- * нет ни одного изображения. Причина простая: положение картинок хранится
+ * Правка готового скетчбука: название, годы и обложка меняются всегда,
+ * формат — пока в книжке нет ни одного изображения. Причина простая: положение картинок хранится
  * долями страницы, и смена пропорций сдвинула бы уже собранные развороты.
  */
 export default function BookSettings({ book, onCancel, onSave, onDelete }) {
@@ -13,7 +15,14 @@ export default function BookSettings({ book, onCancel, onSave, onDelete }) {
   const [size, setSize] = useState({ w: book.widthMm, h: book.heightMm })
   const [year, setYear] = useState(book.year ? String(book.year) : '')
   const [locked, setLocked] = useState(null) // null — ещё проверяем
+  // обложка: снимок с миниатюрой или null — тогда она рисуется из цвета
+  const [cover, setCover] = useState(() =>
+    book.cover ? { blob: book.cover, thumb: book.coverThumb, id: book.coverId } : null,
+  )
+  const [coverBusy, setCoverBusy] = useState(false)
+  const [coverError, setCoverError] = useState(null)
   const inputRef = useRef(null)
+  const fileRef = useRef(null)
 
   useEffect(() => {
     inputRef.current?.select()
@@ -26,6 +35,21 @@ export default function BookSettings({ book, onCancel, onSave, onDelete }) {
     bookHasImages(book.id).then(setLocked)
   }, [book.id])
 
+  const pickCover = async (file) => {
+    if (!file) return
+    setCoverBusy(true)
+    setCoverError(null)
+    try {
+      const prepared = await prepareScan(file)
+      if (!prepared) throw new Error('это не картинка')
+      setCover({ blob: prepared.blob, thumb: prepared.thumb, id: uid() })
+    } catch (err) {
+      setCoverError(`Не получилось прочитать файл: ${err.message}`)
+    } finally {
+      setCoverBusy(false)
+    }
+  }
+
   const valid = size.w >= 20 && size.h >= 20 && size.w <= 1000 && size.h <= 1000
 
   const submit = (e) => {
@@ -36,6 +60,9 @@ export default function BookSettings({ book, onCancel, onSave, onDelete }) {
       widthMm: Math.round(size.w),
       heightMm: Math.round(size.h),
       year: normalizeYears(year),
+      cover: cover?.blob ?? null,
+      coverThumb: cover?.thumb ?? null,
+      coverId: cover?.id ?? null,
     })
   }
 
@@ -91,9 +118,28 @@ export default function BookSettings({ book, onCancel, onSave, onDelete }) {
               background: book.coverColor,
             }}
           >
-            <span>
-              {Math.round(size.w)}×{Math.round(size.h)} мм
-            </span>
+            <BookCover book={{ ...book, title: title.trim() || 'Без названия', year: normalizeYears(year) }} image={cover?.blob} />
+          </div>
+          <div className="cover-actions">
+            <button type="button" className="btn" disabled={coverBusy} onClick={() => fileRef.current?.click()}>
+              {coverBusy ? 'Читаем…' : cover ? 'Заменить обложку' : 'Загрузить обложку'}
+            </button>
+            {cover && (
+              <button type="button" className="link-btn small" onClick={() => setCover(null)}>
+                убрать — будет цвет с названием
+              </button>
+            )}
+            {coverError && <span className="small danger-text">{coverError}</span>}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*,.heic,.heif"
+              hidden
+              onChange={(e) => {
+                pickCover(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
           </div>
         </div>
 

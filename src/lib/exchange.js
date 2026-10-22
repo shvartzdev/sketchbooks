@@ -106,6 +106,8 @@ export async function exportBook(bookId, dirHandle, onProgress) {
     heightMm: book.heightMm,
     coverColor: book.coverColor,
     year: book.year ?? null,
+    // снимок обложки лежит среди картинок; нет его — обложку рисуют из цвета
+    cover: null,
     // место на стене едет вместе с книжкой: сайт расставляет полку так же,
     // как она стоит дома
     shelf: book.shelf ?? null,
@@ -163,6 +165,14 @@ export async function exportBook(bookId, dirHandle, onProgress) {
     manifest.pages.push({ id: page.id, items })
   }
 
+  // Имя файла обложки — от её id: новая обложка ложится новым файлом, и сборка
+  // сайта не примет её за старую, у которой копии для экрана уже готовы.
+  if (book.cover) {
+    const file = `cover-${book.coverId}.jpg`
+    if (!(await fileExists(imagesDir, file))) await writeFile(imagesDir, file, book.cover)
+    manifest.cover = `images/${file}`
+  }
+
   // Закладки держатся за страницу, а в файле страница — это её место в списке:
   // при переносе на другую машину у страниц будут новые id, а порядок тот же.
   const pageIndex = new Map(pages.map((p, i) => [p.id, i]))
@@ -180,6 +190,7 @@ export async function exportBook(bookId, dirHandle, onProgress) {
   const used = new Set(
     manifest.pages.flatMap((p) => p.items.filter((i) => i.kind !== 'text').map((i) => `${i.id}.jpg`)),
   )
+  if (manifest.cover) used.add(manifest.cover.split('/').pop())
   let removed = 0
   for (const dir of [imagesDir, thumbsDir]) {
     for await (const entry of dir.values()) {
@@ -272,10 +283,24 @@ async function importOne(bookDir, onProgress) {
       .filter((b) => created[b.page])
       .map((b) => ({ id: b.id, title: b.title, color: b.color, pageId: created[b.page].id })),
     slug: bookDir.name,
+    ...(await readCover(imagesDir, manifest.cover)),
     shelf: manifest.shelf ?? undefined,
     order: manifest.order ?? undefined,
   })
   return { id: book.id, title: book.title, pages: pages.length }
+}
+
+// Обложка из папки: сам снимок и миниатюра для фона ленты.
+async function readCover(imagesDir, path) {
+  if (!path) return {}
+  const name = path.split('/').pop()
+  try {
+    const blob = await (await imagesDir.getFileHandle(name)).getFile()
+    const { thumb } = await makeThumb(blob)
+    return { cover: blob, coverThumb: thumb, coverId: name.replace(/^cover-|\.jpg$/g, '') }
+  } catch {
+    return {} // файла нет — обложка нарисуется из цвета
+  }
 }
 
 export async function importBooks(dirHandle, onProgress) {

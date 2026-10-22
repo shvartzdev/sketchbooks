@@ -102,7 +102,6 @@ async function main() {
     if (!existsSync(manifestPath)) continue
     const m = await readJson(manifestPath)
     const pages = m.pages || []
-    const first = pages.flatMap((p) => p.items || []).find((it) => it.file)
     const made = await deriveBook(entry.name)
     derived += made.count
     derivedBytes += made.bytes
@@ -118,7 +117,10 @@ async function main() {
       order: m.order ?? null,
       createdAt: m.createdAt ?? 0,
       pages: pages.length,
-      cover: first ? `${entry.name}/${MINI.dir}/${base(first.file)}.webp` : null,
+      // обложка — отдельный снимок, если его положили; иначе сайт сам
+      // рисует обложку из цвета, названия и годов
+      cover: m.cover ? `${entry.name}/${WEB.dir}/${base(m.cover)}.webp` : null,
+      coverThumb: m.cover ? `${entry.name}/${MINI.dir}/${base(m.cover)}.webp` : null,
     })
   }
 

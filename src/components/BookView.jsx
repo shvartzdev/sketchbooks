@@ -11,6 +11,7 @@ import { EDITOR } from '../lib/mode.js'
 import Overview from './Overview.jsx'
 import PageRail from './PageRail.jsx'
 import PageContent from './PageContent.jsx'
+import BookCover from './BookCover.jsx'
 import PageEditor from './PageEditor.jsx'
 import PageZoom from './PageZoom.jsx'
 import BookmarksPanel from './BookmarksPanel.jsx'
@@ -43,7 +44,6 @@ const peekScale = (n) => 1 - Math.min(PEEK_MAX, n) * 0.006
 // Насколько лист выступает из-под разворота: справа считаем от первого
 // нераскрытого, слева — от того, что лежит под левой страницей.
 const peekOf = (d) => (d > 0 ? Math.min(PEEK_MAX, d) : Math.max(0, Math.min(PEEK_MAX, -d - 1)))
-const REFERENCE_MM = { w: 210, h: 297 } // A4 — эталон масштаба на сцене
 const COVER_SLOTS = 2
 
 export default function BookView({ bookId, onBack, entrance = null, onEntered }) {
@@ -325,14 +325,9 @@ export default function BookView({ bookId, onBack, entrance = null, onEntered })
       const narrow = rect.width < 700
       const maxW = rect.width * (narrow ? 0.98 : 0.9)
       const maxH = rect.height * (narrow ? 0.94 : 0.88)
-      // Масштаб общий для всех книжек: сцену целиком занимает разворот A4,
-      // а всё меньшее показывается настолько же меньше — маленький блокнот
-      // и должен выглядеть маленьким. Формат крупнее A4 просто вписываем.
-      // Общая мерка нужна, когда книжки видны рядом; на телефоне книжка всегда
-      // одна на экране, и держать её мелкой ради сравнения не с чем.
-      const fit = (wMm, hMm) => Math.min(maxW / (wMm * 2), maxH / hMm)
-      const own = fit(book.widthMm, book.heightMm)
-      const pxPerMm = narrow ? own : Math.min(own, fit(REFERENCE_MM.w, REFERENCE_MM.h))
+      // Разворот занимает сцену целиком, какого бы формата ни была книжка:
+      // открытая книжка не должна выглядеть меньше своей обложки на полке.
+      const pxPerMm = Math.min(maxW / (book.widthMm * 2), maxH / book.heightMm)
       const w = book.widthMm * 2 * pxPerMm
       const h = book.heightMm * pxPerMm
       // ход листания: столько пикселей ведения — один лист; дальше по сцене
@@ -1121,14 +1116,7 @@ function Face({ slot, side, book, thumbs = false, bare = false }) {
       className={`face face-${side} face-${kind}`}
       style={isCover ? { background: book.coverColor } : undefined}
     >
-      {kind === 'cover' && (
-        <div className="cover-plate">
-          <span className="cover-title">{book.title}</span>
-          <span className="cover-format">
-            {book.widthMm}×{book.heightMm} мм
-          </span>
-        </div>
-      )}
+      {kind === 'cover' && <BookCover book={book} />}
       {kind === 'page' && !bare && (
         <PageContent
           page={slot.page}
